@@ -15,12 +15,11 @@ async function sendOTP(req, res) {
     })
 
     const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
-    console.log("OTP is : ", otp);
 
     const mailOptions = {
         from: 'amanvermalmv211@gmail.com',
         to: req.body.email,
-        subject: 'Verify Your Email',
+        subject: 'Verify Your Email(Testing Period)',
         html: `<p>OTP for verification at cograd.in is : <b>${otp}</b>.<br>This code is expires within 2 minutes.</p>`
     }
 
