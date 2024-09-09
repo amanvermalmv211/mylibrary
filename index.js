@@ -2,7 +2,10 @@ import express from 'express';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import userauth from './routes/userauth.js'
+import userauth from './routes/userauth.js';
+import superadmin from './routes/superadmin.js';
+import editorworks from './routes/editorworks.js';
+import publicroute from './routes/publicroute.js';
 
 const app = express();
 
@@ -18,7 +21,9 @@ app.get('/', (req, res)=>{
 
 // Available Routes
 app.use('/user/userauth', userauth);
-
+app.use('/superadmin', superadmin);
+app.use('/editor', editorworks);
+app.use('/user', publicroute);
 
 mongoose.connect(process.env.DB_URI)
 .then(()=>{
@@ -28,5 +33,5 @@ mongoose.connect(process.env.DB_URI)
     });
 })
 .catch((error)=>{
-    console.log(error);
+    console.log(error)
 });

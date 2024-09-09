@@ -15,6 +15,7 @@ async function sendOTP(req, res) {
     })
 
     const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
+    console.log(otp)
 
     const mailOptions = {
         from: 'amanvermalmv211@gmail.com',

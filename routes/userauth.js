@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import User from '../model/User.js';
+import Editor from '../model/Editor.js';
 import OTPVerification from '../model/OTP.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -24,7 +25,7 @@ router.post('/createuser', async (req, res) => {
         // check whether the user with the email exists already.
         let user = await User.findOne({ email: req.body.email });
         if (user && user.isverified) {
-            return res.status(400).json({ success, error: "Sorry a user with this email already exists" })
+            return res.status(400).json({ success, message: "Sorry a user with this email already exists" })
         }
         else if (user && !user.isverified) {
             const newUser = {
@@ -36,12 +37,11 @@ router.post('/createuser', async (req, res) => {
             return;
         }
 
-        // Creating new Admin
+        // Creating new User
         user = await User.create({
-            name: req.body.name,
             email: req.body.email,
             password: secPass,
-            isverified: false
+            type: req.body.type
         });
 
         sendOTP(req, res);
@@ -61,22 +61,23 @@ router.post('/loginuser', async (req, res) => {
     try {
         let user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ success, error: "Please try to login with correct credentials" });
+            return res.status(400).json({ success, message: "User doesn't exists" });
         }
 
         const passwordCompare = await bcrypt.compare(password, user.password);
         if (!passwordCompare) {
-            return res.status(400).json({ success, error: "Please try to login with correct credentials" });
+            return res.status(400).json({ success, message: "Password do not match!" });
         }
 
         const data = {
             user: {
-                id: user.id
+                id: user.id,
+                type: user.type
             }
         }
         const authtoken = jwt.sign(data, JWT_SECRET);
         success = true;
-        res.json({ success, authtoken });
+        res.json({ success, authtoken, type: user.type, message: "User loged in successfully" });
 
     } catch (err) {
         console.log(err.message);
@@ -88,11 +89,11 @@ router.post('/loginuser', async (req, res) => {
 // Route 3 : Verify OTP and User : POST "/user/userauth/verifyotp"
 router.post('/verifyotp', async (req, res) => {
     let success = false;
-    const { email, otp } = req.body;
+    const userdata = req.body;
 
     try {
         // check whether the user with the email exists already.
-        let userotp = await OTPVerification.findOne({ email: email });
+        let userotp = await OTPVerification.findOne({ email: userdata.email });
         if (!userotp) {
             return res.status(400).json({ success, message: "User doesn't exist." })
         }
@@ -100,7 +101,7 @@ router.post('/verifyotp', async (req, res) => {
         const currDate = new Date();
 
         if (currDate.getTime() <= (userotp.timestamp + 120000)) {
-            const otpCompare = await bcrypt.compare(otp, userotp.otp);
+            const otpCompare = await bcrypt.compare(userdata.otp, userotp.otp);
             if (!otpCompare) {
                 return res.status(400).json({ success, message: "OTP does not matched." });
             }
@@ -108,8 +109,34 @@ router.post('/verifyotp', async (req, res) => {
             const newUser = {};
             newUser.isverified = true;
 
-            let user = await User.findOneAndUpdate({ email }, { $set: newUser }, { new: true });
-            await OTPVerification.findOneAndDelete({email});
+            let user = await User.findOneAndUpdate({ email: userdata.email }, { $set: newUser }, { new: true });
+
+            if (user.type === "student") {
+                // Creating new student
+                await Editor.create({
+                    userId: user._id,
+                    name: req.body.name,
+                    contactnum: req.body.contactnum
+                })
+            }
+            else if (user.type === "owner ") {
+                // Creating new owner
+                await Editor.create({
+                    userId: user._id,
+                    name: req.body.name,
+                    contactnum: req.body.contactnum
+                })
+            }
+            else if (user.type === "editor") {
+                // Creating new editor
+                await Editor.create({
+                    userId: user._id,
+                    name: req.body.name,
+                    contactnum: req.body.contactnum
+                })
+            }
+
+            await OTPVerification.findOneAndDelete({ email: userdata.email });
 
             const data = {
                 user: {
@@ -118,9 +145,9 @@ router.post('/verifyotp', async (req, res) => {
             }
             const authtoken = jwt.sign(data, JWT_SECRET);
             success = true;
-            return res.status(200).json({ success, authtoken, message: "OTP Verified Successfully!" });
+            return res.status(200).json({ success, authtoken, type: user.type, message: "OTP Verified Successfully!" });
         }
-        else{
+        else {
             return res.status(400).json({ success: false, message: "Time limit exceed. Please try again." });
         }
 
