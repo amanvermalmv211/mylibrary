@@ -30,7 +30,8 @@ router.post('/createuser', async (req, res) => {
         else if (user && !user.isverified) {
             const newUser = {
                 name: req.body.name,
-                password: secPass
+                password: secPass,
+                type: req.body.type
             }
             await User.findOneAndUpdate({ email: req.body.email }, { $set: newUser }, { new: true });
             sendOTP(req, res);
@@ -60,7 +61,7 @@ router.post('/loginuser', async (req, res) => {
     const { email, password } = req.body;
     try {
         let user = await User.findOne({ email });
-        if (!user) {
+        if (!user || !user.isverified) {
             return res.status(400).json({ success, message: "User doesn't exists" });
         }
 
