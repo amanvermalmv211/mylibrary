@@ -11,6 +11,16 @@ const ResultSchema = new Schema({
         required: true,
         unique: true
     },
+    youlink: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    tubelink: {
+        type: String,
+        required: true,
+        unique: true
+    },
     formdate: {
         type: Date,
         default: Date.now,
