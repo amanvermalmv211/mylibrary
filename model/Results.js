@@ -21,11 +21,6 @@ const ResultSchema = new Schema({
         required: true,
         unique: true
     },
-    checklink: {
-        type: String,
-        required: true,
-        unique: true
-    },
     formdate: {
         type: Date,
         default: Date.now,
