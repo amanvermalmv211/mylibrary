@@ -11,12 +11,7 @@ const ResultSchema = new Schema({
         required: true,
         unique: true
     },
-    youlink: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    tubelink: {
+    youtubelink: {
         type: String,
         required: true,
         unique: true
