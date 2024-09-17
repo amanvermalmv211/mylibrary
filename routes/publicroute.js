@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import fetchuser from '../middleware/fetchuser.js';
 import Ebook from '../model/Ebooks.js';
+import Result from '../model/Results.js';
 
 dotenv.config();
 
@@ -19,6 +19,20 @@ router.get('/getebooks', async (req, res) => {
     }
     catch (err) {
         return res.status(200).json({ success: false, message: "Unable to get E-books" });
+    }
+});
+
+// Route 2 : Retrive results by using : GET "/user/getresults"
+router.get('/getresults', async (req, res) => {
+    let success = false;
+    try {
+        const results = await Result.find();
+        success = true;
+
+        return res.status(200).json({ success, results: results })
+    }
+    catch (err) {
+        return res.status(200).json({ success: false, message: "Unable to get results" });
     }
 });
 

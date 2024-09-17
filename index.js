@@ -16,7 +16,7 @@ app.use(express.json());
 dotenv.config();
 
 app.get('/', (req, res)=>{
-    return res.status(234).send("Welcome to MERN stack project...");
+    return res.status(234).send("Welcome to myLibrary backend services...");
 })
 
 // Available Routes

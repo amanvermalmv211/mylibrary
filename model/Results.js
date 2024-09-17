@@ -6,6 +6,10 @@ const ResultSchema = new Schema({
         type: String,
         required: true
     },
+    appname: {
+        type: String,
+        required: true
+    },
     formlink: {
         type: String,
         required: true,
@@ -16,20 +20,17 @@ const ResultSchema = new Schema({
         required: true,
         unique: true
     },
-    formdate: {
-        type: Date,
-        default: Date.now,
-        required: true,
-        get: (formdate) => formdate.getTime(),
-        set: (formdate) => new Date(formdate)
-    },
     endformdate: {
         type: Date,
-        required: true
+        required: true,
+        get: (endformdate) => endformdate.getTime(),
+        set: (endformdate) => new Date(endformdate)
     },
     expirydate: {
-        type: String,
-        required: true
+        type: Date,
+        required: true,
+        get: (expirydate) => expirydate.getTime(),
+        set: (expirydate) => new Date(expirydate)
     }
 });
 

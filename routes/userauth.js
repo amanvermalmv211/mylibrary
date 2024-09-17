@@ -6,6 +6,7 @@ import OTPVerification from '../model/OTP.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import sendOTP from './sendmail.js';
+import Libowner from '../model/Libowner.js';
 
 dotenv.config();
 
@@ -48,7 +49,6 @@ router.post('/createuser', async (req, res) => {
         sendOTP(req, res);
     }
     catch (err) {
-        console.log(err.message);
         res.status(500).send("Internal server error occured.");
     }
 
@@ -81,7 +81,6 @@ router.post('/loginuser', async (req, res) => {
         res.json({ success, authtoken, type: user.type, message: "User loged in successfully" });
 
     } catch (err) {
-        console.log(err.message);
         res.status(500).send("Internal server error occured.");
     }
 
@@ -120,9 +119,9 @@ router.post('/verifyotp', async (req, res) => {
                     contactnum: req.body.contactnum
                 })
             }
-            else if (user.type === "owner ") {
+            else if (user.type === "libowner") {
                 // Creating new owner
-                await Editor.create({
+                await Libowner.create({
                     userId: user._id,
                     name: req.body.name,
                     contactnum: req.body.contactnum
@@ -141,7 +140,8 @@ router.post('/verifyotp', async (req, res) => {
 
             const data = {
                 user: {
-                    id: user.id
+                    id: user.id,
+                    type: user.type
                 }
             }
             const authtoken = jwt.sign(data, JWT_SECRET);
@@ -149,12 +149,11 @@ router.post('/verifyotp', async (req, res) => {
             return res.status(200).json({ success, authtoken, type: user.type, message: "OTP Verified Successfully!" });
         }
         else {
-            return res.status(400).json({ success: false, message: "Time limit exceed. Please try again." });
+            return res.status(400).json({ success: false, message: "Time limit exceed. Please try again."});
         }
 
     }
     catch (err) {
-        console.log(err.message);
         res.status(500).send("Internal server error occured.");
     }
 
