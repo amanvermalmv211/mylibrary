@@ -7,6 +7,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import sendOTP from './sendmail.js';
 import Libowner from '../model/Libowner.js';
+import Admin from '../model/Superadmin.js';
 
 dotenv.config();
 
@@ -133,6 +134,13 @@ router.post('/verifyotp', async (req, res) => {
                     userId: user._id,
                     name: req.body.name,
                     contactnum: req.body.contactnum
+                })
+            }
+            else if (user.type === "admin") {
+                // Creating new editor
+                await Admin.create({
+                    userId: user._id,
+                    name: req.body.name,
                 })
             }
 

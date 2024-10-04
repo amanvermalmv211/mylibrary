@@ -3,6 +3,7 @@ import express from 'express';
 import Ebook from '../model/Ebooks.js';
 import Result from '../model/Results.js';
 import fetchuser, { fetchIsAllowed } from '../middleware/fetchuser.js';
+import Editor from '../model/Editor.js';
 
 dotenv.config();
 
@@ -131,6 +132,22 @@ router.put('/updateapp/:id', fetchuser, fetchIsAllowed, async (req, res) => {
     }
     catch (err) {
         return res.status(500).json({ success: false, message: "Unable to update Application" });
+    }
+});
+
+// Route 7 : Get Editor by using : GET "/editor/profile"
+router.get('/profile', fetchuser, async (req, res) => {
+    let success = false;
+    try {
+        const isEditor = await Editor.findOne({userId: req.user.id});
+        if (!isEditor) { return res.status(404).json({ success: false, message: "Editor is not found" }) };
+        
+        success = true;
+
+        return res.status(200).json({ success, data: isEditor })
+    }
+    catch (err) {
+        return res.status(500).json({ success: false, message: "Unable to fetch!" });
     }
 });
 
