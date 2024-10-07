@@ -36,4 +36,15 @@ router.get('/getresults', async (req, res) => {
     }
 });
 
+// Route 3 : Retrive results by using : GET "/user/getresults"
+router.post('/save/contactdetails', async (req, res) => {
+    let success = false;
+    try {
+        return res.status(200).json({ success: true, message: "Contact details saved successfully" })
+    }
+    catch (err) {
+        return res.status(200).json({ success: false, message: "Unable to get results" });
+    }
+});
+
 export default router;
