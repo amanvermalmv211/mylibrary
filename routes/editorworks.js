@@ -79,8 +79,7 @@ router.post('/addapp', fetchuser, fetchIsAllowed, async (req, res) => {
             appname: req.body.appname,
             formlink: req.body.formlink,
             youtubelink: req.body.youtubelink,
-            endformdate: req.body.endformdate,
-            expirydate: req.body.expirydate,
+            endformdate: req.body.endformdate
         });
 
         success = true;

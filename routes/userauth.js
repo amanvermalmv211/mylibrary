@@ -82,7 +82,7 @@ router.post('/loginuser', async (req, res) => {
         res.json({ success, authtoken, type: user.type, message: "User loged in successfully" });
 
     } catch (err) {
-        res.status(500).send("Internal server error occured.");
+        res.status(500).send(err.message);
     }
 
 });
@@ -124,8 +124,14 @@ router.post('/verifyotp', async (req, res) => {
                 // Creating new owner
                 await Libowner.create({
                     userId: user._id,
-                    name: req.body.name,
-                    contactnum: req.body.contactnum
+                    ownername: req.body.ownername,
+                    contactnum: req.body.contactnum,
+                    libcontactnum: req.body.libcontactnum,
+                    aadharnum: req.body.aadharnum,
+                    localarea: req.body.localarea,
+                    city: req.body.city,
+                    state: req.body.state,
+                    pin: req.body.pin
                 })
             }
             else if (user.type === "editor") {
@@ -162,7 +168,7 @@ router.post('/verifyotp', async (req, res) => {
 
     }
     catch (err) {
-        res.status(500).send("Internal server error occured.");
+        res.status(500).send(err.message);
     }
 
 });
