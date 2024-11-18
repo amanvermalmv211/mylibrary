@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import userauth from './routes/userauth.js';
 import superadmin from './routes/superadmin.js';
+import libowner from './routes/libowner.js';
 import editorworks from './routes/editorworks.js';
 import publicroute from './routes/publicroute.js';
 
@@ -22,6 +23,7 @@ app.get('/', (req, res)=>{
 // Available Routes
 app.use('/user/userauth', userauth);
 app.use('/superadmin', superadmin);
+app.use('/libowner', libowner);
 app.use('/editor', editorworks);
 app.use('/user', publicroute);
 

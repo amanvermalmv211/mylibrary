@@ -13,10 +13,6 @@ const EditorSchema = new Schema({
     contactnum: {
         type: Number,
         required: true
-    },
-    isallowed: {
-        type: Boolean,
-        default: false
     }
 });
 

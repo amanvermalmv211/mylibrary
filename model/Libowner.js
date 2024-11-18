@@ -6,6 +6,10 @@ const LibownerSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true,
     },
+    profileImg: {
+        type: Number,
+        default: 0
+    },
     ownername: {
         type: String,
         required: true
@@ -24,23 +28,23 @@ const LibownerSchema = new Schema({
     },
     aadharnum: {
         type: Number,
-        required: true
+        default: null
     },
     localarea: {
         type: String,
-        default: null
+        required: true
     },
     city: {
         type: String,
-        default: null
+        required: true
     },
     state: {
         type: String,
-        default: null
+        required: true
     },
     pin: {
         type: String,
-        default: null
+        required: true
     },
     googlemap: {
         type: String,
@@ -48,8 +52,10 @@ const LibownerSchema = new Schema({
     },
     shifts: {
         type: [{
-            shiftTime: { type: String, default: '9:00 AM - 5:00 PM' },
-            bookingPrice: { type: Number, default: 500 },
+            stTime: { type: String, default: '7' },
+            endTime: { type: String, default: '12' },
+            price: { type: Number, default: 700 },
+            discountPrice: { type: Number, default: 500 },
             // Default 80 seats per shift
             numberOfSeats: {
                 type: [{
@@ -65,8 +71,32 @@ const LibownerSchema = new Schema({
             }
         }],
         default: [{
-            shiftTime: '9:00 AM - 5:00 PM',
-            bookingPrice: 500,
+            stTime: '7',
+            endTime: '12',
+            price: 700,
+            discountPrice: 500,
+            numberOfSeats: Array(80).fill({
+                student: null,
+                gender: 'boy',
+                isBooked: false
+            })
+        },
+        {
+            stTime: '12',
+            endTime: '17',
+            price: 1000,
+            discountPrice: 700,
+            numberOfSeats: Array(80).fill({
+                student: null,
+                gender: 'boy',
+                isBooked: false
+            })
+        },
+        {
+            stTime: '17',
+            endTime: '21',
+            price: 800,
+            discountPrice: 600,
             numberOfSeats: Array(80).fill({
                 student: null,
                 gender: 'boy',
@@ -76,7 +106,6 @@ const LibownerSchema = new Schema({
     },
     isallowed: {
         type: Boolean,
-        required: true,
         default: false
     }
 });

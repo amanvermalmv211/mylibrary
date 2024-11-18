@@ -18,6 +18,10 @@ const UserSchema = new Schema({
     isverified:{
         type: Boolean,
         default: false
+    },
+    isallowed:{
+        type: Boolean,
+        default: false
     }
 });
 

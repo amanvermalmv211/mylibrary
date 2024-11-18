@@ -74,12 +74,13 @@ router.post('/loginuser', async (req, res) => {
         const data = {
             user: {
                 id: user.id,
-                type: user.type
+                type: user.type,
+                isallowed: user.isallowed
             }
         }
         const authtoken = jwt.sign(data, JWT_SECRET);
         success = true;
-        res.json({ success, authtoken, type: user.type, message: "User loged in successfully" });
+        res.json({ success, authtoken, type: user.type, isallowed: user.isallowed, message: "User loged in successfully" });
 
     } catch (err) {
         res.status(500).send(err.message);
@@ -126,8 +127,6 @@ router.post('/verifyotp', async (req, res) => {
                     userId: user._id,
                     ownername: req.body.ownername,
                     contactnum: req.body.contactnum,
-                    libcontactnum: req.body.libcontactnum,
-                    aadharnum: req.body.aadharnum,
                     localarea: req.body.localarea,
                     city: req.body.city,
                     state: req.body.state,
@@ -155,20 +154,22 @@ router.post('/verifyotp', async (req, res) => {
             const data = {
                 user: {
                     id: user.id,
-                    type: user.type
+                    type: user.type,
+                    isallowed: user.isallowed
                 }
             }
             const authtoken = jwt.sign(data, JWT_SECRET);
             success = true;
-            return res.status(200).json({ success, authtoken, type: user.type, message: "OTP Verified Successfully!" });
+
+            return res.status(200).json({ success, authtoken, type: user.type, isallowed: user.isallowed, message: "OTP Verified Successfully!" });
         }
         else {
-            return res.status(400).json({ success: false, message: "Time limit exceed. Please try again."});
+            return res.status(400).json({ success: false, message: "Time limit exceed. Please try again." });
         }
 
     }
     catch (err) {
-        res.status(500).send(err.message);
+        res.status(500).json({ success: false, message: err.message });
     }
 
 });
