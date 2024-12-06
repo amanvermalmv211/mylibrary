@@ -8,7 +8,7 @@ dotenv.config();
 const router = express.Router();
 
 // Route 1 : Create user using : POST "/libowner/getlibowner"
-router.get('/getlibowner', fetchuser, fetchIsAllowed, async (req, res) => {
+router.get('/getlibowner', fetchuser, async (req, res) => {
     let success = false;
 
     try {
@@ -27,7 +27,7 @@ router.get('/getlibowner', fetchuser, fetchIsAllowed, async (req, res) => {
 });
 
 // Route 2 : Create user using : POST "/libowner/updateprofile"
-router.put('/updateprofile', fetchuser, fetchIsAllowed, async (req, res) => {
+router.put('/updateprofile', fetchuser, async (req, res) => {
     let success = false;
 
     const libraryDetails = req.body;
