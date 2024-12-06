@@ -4,13 +4,23 @@ import dotenv from 'dotenv';
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
-export const fetchIsAllowed = async (req, res, next)=>{
+export const fetchIsAdmin = async (req, res, next)=>{
     try {
         if(req.user.type === "admin"){
             next();
             return;
         }
+        else{
+            return res.status(500).json({ success: false, message: "Not Allowed: Admin Only" })
+        }
+    } catch (error) {
+        res.status(401).json({success: false, message: "Server Error: Try again later!"});
+    }
 
+}
+
+export const fetchIsAllowed = async (req, res, next)=>{
+    try {
         if(req.user.type === "editor"){
             if(!req.user.isallowed){
                 return res.status(401).json({success: false, message: "Currently you are not allowed to perform any actions"});

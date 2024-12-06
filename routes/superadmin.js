@@ -1,15 +1,16 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import Admin from '../model/Superadmin.js';
-import fetchuser, { fetchIsAllowed } from '../middleware/fetchuser.js';
+import fetchuser, { fetchIsAdmin } from '../middleware/fetchuser.js';
 import Libowner from '../model/Libowner.js';
+import User from '../model/User.js';
 
 dotenv.config();
 
 const router = express.Router();
 
 // Route 1 : Get admin details using : GET "/superadmin/getadmin"
-router.get('/getadmin', fetchuser, fetchIsAllowed, async (req, res) => {
+router.get('/getadmin', fetchuser, fetchIsAdmin, async (req, res) => {
     let success = false;
 
     try {
@@ -28,7 +29,7 @@ router.get('/getadmin', fetchuser, fetchIsAllowed, async (req, res) => {
 });
 
 // Route 2 : Get requested libraries using : GET "/superadmin/getrequest/library"
-router.get('/getrequest/library', fetchuser, fetchIsAllowed, async (req, res) => {
+router.get('/getrequest/library', fetchuser, fetchIsAdmin, async (req, res) => {
     let success = false;
 
     try {
@@ -45,8 +46,26 @@ router.get('/getrequest/library', fetchuser, fetchIsAllowed, async (req, res) =>
 
 });
 
-// Route 3 : Route for admin to update library details :  PUT "/superadmin/updatelibrary/:id"
-router.put('/updatelibrary/:id', fetchuser, fetchIsAllowed, async (req, res) => {
+// Route 3 : Get all libraries using : GET "/superadmin/getalllibrary"
+router.get('/getalllibrary', fetchuser, fetchIsAdmin, async (req, res) => {
+    let success = false;
+
+    try {
+        let alllib = await Libowner.find({ isallowed: true });
+        if (!alllib) {
+            return res.status(400).json({ success, message: "There is no Library!" })
+        }
+
+        res.status(200).json({ success: true, data: alllib })
+    }
+    catch (err) {
+        res.status(500).json({ success: false, message: "GetRequest: Unable to get Library!" });
+    }
+
+});
+
+// Route 4 : Route for admin to update library details :  PUT "/superadmin/updatelibrary/:id"
+router.put('/updatelibrary/:id', fetchuser, fetchIsAdmin, async (req, res) => {
 
     const libraryId = req.params.id;
     const libraryDetails = req.body;
@@ -95,7 +114,13 @@ router.put('/updatelibrary/:id', fetchuser, fetchIsAllowed, async (req, res) => 
 
         // Save updated library data
         await library.save();
-        res.status(200).json({ success: true, message: 'Library details updated successfully'});
+
+        const newUser = {}
+        newUser.isallowed = true;
+
+        await User.findByIdAndUpdate(library.userId, { $set: newUser }, { new: true });
+
+        res.status(200).json({ success: true, message: 'Library details updated successfully' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'Server error. Unable to update library details.' });

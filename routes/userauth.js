@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken';
 import sendOTP from './sendmail.js';
 import Libowner from '../model/Libowner.js';
 import Admin from '../model/Superadmin.js';
+import Student from '../model/Student.js';
 
 dotenv.config();
 
@@ -115,14 +116,16 @@ router.post('/verifyotp', async (req, res) => {
 
             if (user.type === "student") {
                 // Creating new student
-                await Editor.create({
+                await Student.create({
                     userId: user._id,
-                    name: req.body.name,
-                    contactnum: req.body.contactnum
+                    name: userdata.name,
+                    gender: userdata.gender,
+                    address: userdata.address,
+                    contactnum: userdata.contactnum
                 })
             }
             else if (user.type === "libowner") {
-                // Creating new owner
+                // Creating new libowner
                 await Libowner.create({
                     userId: user._id,
                     ownername: req.body.ownername,
@@ -142,7 +145,7 @@ router.post('/verifyotp', async (req, res) => {
                 })
             }
             else if (user.type === "admin") {
-                // Creating new editor
+                // Creating new admin
                 await Admin.create({
                     userId: user._id,
                     name: req.body.name,
