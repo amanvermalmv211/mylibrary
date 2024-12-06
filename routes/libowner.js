@@ -7,8 +7,8 @@ dotenv.config();
 
 const router = express.Router();
 
-// Route 1 : Create user using : POST "/libowner/getlibowner"
-router.get('/getlibowner', fetchuser, async (req, res) => {
+// Route 1 : Get user using : GET "/libowner/getlibowner"
+router.get('/getlibowner', fetchuser, fetchIsAllowed, async (req, res) => {
     let success = false;
 
     try {
@@ -26,8 +26,8 @@ router.get('/getlibowner', fetchuser, async (req, res) => {
 
 });
 
-// Route 2 : Create user using : POST "/libowner/updateprofile"
-router.put('/updateprofile', fetchuser, async (req, res) => {
+// Route 2 : Update user using : PUT "/libowner/updateprofile"
+router.put('/updateprofile', fetchuser, fetchIsAllowed, async (req, res) => {
     let success = false;
 
     const libraryDetails = req.body;
@@ -80,49 +80,6 @@ router.put('/updateprofile', fetchuser, async (req, res) => {
         res.status(500).json({ success: false, message: "Internal server error occured" });
     }
 
-});
-
-// Route 3 : Route for admin to update library details :  PUT "/libowner/updatelibrary/:id"
-router.put('/updatelibrary/:id', fetchuser, fetchIsAllowed, async (req, res) => {
-
-    const libraryId = req.params.id;
-    const libraryDetails = req.body;
-
-    try {
-        // Find library by ID
-        const library = await Libowner.findById(libraryId);
-        if (!library) {
-            return res.status(404).json({ success: false, message: 'Library not found' });
-        }
-
-        // Update shifts if provided
-        if (Array.isArray(libraryDetails.shifts)) {
-            library.shifts = libraryDetails.shifts.map((shift) => ({
-                stTime: shift.stTime || '7',
-                endTime: shift.endTime || '12',
-                price: shift.price || 700,
-                discountPrice: shift.discountPrice || 500,
-                numberOfSeats: shift.numberOfSeats ?
-                    shift.numberOfSeats.map(seat => ({
-                        student: seat.student || null,
-                        gender: seat.gender || 'boy',
-                        isBooked: seat.isBooked || false
-                    })) : Array(80).fill({
-                        student: null,
-                        gender: 'boy',
-                        isBooked: false
-                    })
-            }));
-        }
-        
-        // Save updated library data
-        await library.save();
-        
-        res.status(200).json({ success: true, message: 'Library details updated successfully'});
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: 'Server error. Unable to update library details.' });
-    }
 });
 
 export default router;
