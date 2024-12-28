@@ -42,7 +42,8 @@ router.put('/updateprofile', fetchuser, async (req, res) => {
         if (stdDetails.profileImg || stdDetails.profileImg === 0) std.profileImg = stdDetails.profileImg;
         if (stdDetails.name) std.name = stdDetails.name;
         if (stdDetails.contactnum) std.contactnum = stdDetails.contactnum;
-        if (stdDetails.address) std.address = stdDetails.address;
+        if (stdDetails.city) std.city = stdDetails.city;
+        if (stdDetails.pin) std.pin = stdDetails.pin;
         if (stdDetails.gender) std.gender = stdDetails.gender;
 
         // Save updated std data
@@ -51,7 +52,7 @@ router.put('/updateprofile', fetchuser, async (req, res) => {
         res.status(200).json({ success: true, message: 'Students details updated successfully', data: std });
     }
     catch (err) {
-        res.status(500).json({ success: false, message: "Internal server error occured" });
+        res.status(500).json({ success: false, message: err.message });
     }
 
 });

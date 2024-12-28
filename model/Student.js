@@ -18,31 +18,55 @@ const StudentSchema = new Schema({
         type: String,
         required: true
     },
-    address: {
+    city: {
         type: String,
+        required: true,
+    },
+    pin: {
+        type: Number,
         required: true
     },
     contactnum: {
         type: Number,
         required: true
     },
-    libDetail: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Libowner',
-        default: null
+    requestedLibraries: {
+        type: [{
+            libraryId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Libowner', // Reference to the library schema
+                required: true,
+            },
+            requestDate: {
+                type: Date,
+                default: Date.now, // Defaults to the current date
+            },
+            status: {
+                type: String,
+                enum: ['Pending', 'Approved', 'Rejected'],
+                default: 'Pending', // Default status for new requests
+            },
+        }],
+        default: [], // Default to an empty array
     },
-    shift: {
-        type: Number,
-        default: null
+    subscriptionDetails: {
+        type: [{
+            libraryId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Libowner',
+                required: true,
+            },
+            subscriptionDate: {
+                type: Date,
+                default: Date.now, // Defaults to the current date
+            },
+            expiryDate: {
+                type: Date,
+                required: true,
+            },
+        }],
+        default: [], // Default to an empty array
     },
-    seat: {
-        type: Number,
-        default: null
-    },
-    issubscribed:{
-        type: Boolean,
-        default: false
-    }
 });
 
 const Student = mongoose.model('student', StudentSchema);

@@ -50,59 +50,126 @@ const LibownerSchema = new Schema({
         type: String,
         default: null
     },
-    shifts: {
-        type: [{
-            stTime: { type: String, default: '7' },
-            endTime: { type: String, default: '12' },
-            price: { type: Number, default: 700 },
-            discountPrice: { type: Number, default: 500 },
-            // Default 80 seats per shift
-            numberOfSeats: {
-                type: [{
-                    student: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
-                    gender: { type: String, default: 'boy', required: true },
-                    isBooked: { type: Boolean, default: false }
-                }],
-                default: Array(80).fill({
-                    student: null,
-                    gender: 'boy',
-                    isBooked: false
-                })
+    floors: {
+        type: [
+            {
+                shifts: {
+                    type: [
+                        {
+                            stTime: { type: String, default: '7' },
+                            endTime: { type: String, default: '12' },
+                            price: {
+                                type: [
+                                    {
+                                        actualPrice: { type: Number, default: 700 },
+                                        discountPrice: { type: Number, default: 500 },
+                                        duration: { type: String, default: '1 Month' }
+                                    }
+                                ],
+                                default: [
+                                    { actualPrice: 700, discountPrice: 500, duration: '1 Month' }
+                                ]
+                            },
+                            numberOfSeats: {
+                                type: [
+                                    {
+                                        student: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+                                        gender: { type: String, default: 'boy', required: true },
+                                        isBooked: { type: Boolean, default: false }
+                                    }
+                                ],
+                                default: Array(80).fill({
+                                    student: null,
+                                    gender: 'boy',
+                                    isBooked: false
+                                })
+                            }
+                        }
+                    ],
+                    default: [
+                        {
+                            stTime: '7',
+                            endTime: '12',
+                            price: [
+                                { actualPrice: 700, discountPrice: 500, duration: '1 Month' }
+                            ],
+                            numberOfSeats: Array(2).fill({
+                                student: null,
+                                gender: 'boy',
+                                isBooked: false
+                            })
+                        },
+                        {
+                            stTime: '12',
+                            endTime: '17',
+                            price: [
+                                { actualPrice: 700, discountPrice: 500, duration: '1 Month' }
+                            ],
+                            numberOfSeats: Array(2).fill({
+                                student: null,
+                                gender: 'boy',
+                                isBooked: false
+                            })
+                        },
+                        {
+                            stTime: '17',
+                            endTime: '21',
+                            price: [
+                                { actualPrice: 700, discountPrice: 500, duration: '1 Month' }
+                            ],
+                            discountPrice: 600,
+                            numberOfSeats: Array(2).fill({
+                                student: null,
+                                gender: 'boy',
+                                isBooked: false
+                            })
+                        }
+                    ]
+                }
             }
-        }],
-        default: [{
-            stTime: '7',
-            endTime: '12',
-            price: 700,
-            discountPrice: 500,
-            numberOfSeats: Array(80).fill({
-                student: null,
-                gender: 'boy',
-                isBooked: false
-            })
-        },
-        {
-            stTime: '12',
-            endTime: '17',
-            price: 1000,
-            discountPrice: 700,
-            numberOfSeats: Array(80).fill({
-                student: null,
-                gender: 'boy',
-                isBooked: false
-            })
-        },
-        {
-            stTime: '17',
-            endTime: '21',
-            price: 800,
-            discountPrice: 600,
-            numberOfSeats: Array(80).fill({
-                student: null,
-                gender: 'boy',
-                isBooked: false
-            })
-        }]
+        ],
+        default: [
+            {
+                shifts: [
+                    {
+                        stTime: '7',
+                        endTime: '12',
+                        price: [
+                            { actualPrice: 700, discountPrice: 500, duration: '1 Month' }
+                        ],
+                        numberOfSeats: Array(2).fill({
+                            student: null,
+                            gender: 'boy',
+                            isBooked: false
+                        })
+                    },
+                    {
+                        stTime: '12',
+                        endTime: '17',
+                        price: [
+                            { actualPrice: 700, discountPrice: 500, duration: '1 Month' }
+                        ],
+                        numberOfSeats: Array(2).fill({
+                            student: null,
+                            gender: 'boy',
+                            isBooked: false
+                        })
+                    },
+                    {
+                        stTime: '17',
+                        endTime: '21',
+                        price: [
+                            { actualPrice: 700, discountPrice: 500, duration: '1 Month' }
+                        ],
+                        numberOfSeats: Array(2).fill({
+                            student: null,
+                            gender: 'boy',
+                            isBooked: false
+                        })
+                    }
+                ]
+            }
+        ]
     },
     isallowed: {
         type: Boolean,

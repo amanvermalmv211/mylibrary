@@ -21,7 +21,7 @@ async function sendOTP(req, res) {
         from: 'amanvermalmv211@gmail.com',
         to: req.body.email,
         subject: 'Verify Your Email(Testing Period)',
-        html: `<p>OTP for verification at cograd.in is : <b>${otp}</b>.<br>This code is expires within 2 minutes.</p>`
+        html: `<p>OTP for verification at mylibrary.in is : <b>${otp}</b>.<br>This code is expires within 2 minutes.</p>`
     }
 
     try {

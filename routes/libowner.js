@@ -51,25 +51,29 @@ router.put('/updateprofile', fetchuser, fetchIsAllowed, async (req, res) => {
         if (libraryDetails.pin) library.pin = libraryDetails.pin;
         if (libraryDetails.googlemap) library.googlemap = libraryDetails.googlemap;
 
-        // Update shifts if provided
-        if (Array.isArray(libraryDetails.shifts)) {
-            library.shifts = libraryDetails.shifts.map((shift) => ({
-                stTime: shift.stTime || '7',
-                endTime: shift.endTime || '12',
-                price: shift.price || 700,
-                discountPrice: shift.discountPrice || 500,
-                numberOfSeats: shift.numberOfSeats ?
-                    shift.numberOfSeats.map(seat => ({
-                        student: seat.student || null,
-                        gender: seat.gender || 'boy',
-                        isBooked: seat.isBooked || false
-                    })) : Array(80).fill({
-                        student: null,
-                        gender: 'boy',
-                        isBooked: false
-                    })
-            }));
+        if (Array.isArray(libraryDetails.floors)) {
+            library.floors = libraryDetails.floors;
         }
+
+        // Update shifts if provided
+        // if (Array.isArray(libraryDetails.shifts)) {
+        //     library.shifts = libraryDetails.shifts.map((shift) => ({
+        //         stTime: shift.stTime || '7',
+        //         endTime: shift.endTime || '12',
+        //         price: shift.price || 700,
+        //         discountPrice: shift.discountPrice || 500,
+        //         numberOfSeats: shift.numberOfSeats ?
+        //             shift.numberOfSeats.map(seat => ({
+        //                 student: seat.student || null,
+        //                 gender: seat.gender || 'boy',
+        //                 isBooked: seat.isBooked || false
+        //             })) : Array(80).fill({
+        //                 student: null,
+        //                 gender: 'boy',
+        //                 isBooked: false
+        //             })
+        //     }));
+        // }
 
         // Save updated library data
         await library.save();
