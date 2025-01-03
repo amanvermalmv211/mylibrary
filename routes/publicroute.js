@@ -49,35 +49,32 @@ router.post('/save/contactdetails', async (req, res) => {
 });
 
 // Route 4 : Retrive library by using : GET "/user/search/library"
-router.get('/search/library', async (req, res) => {
+router.get('/searchlib', async (req, res) => {
     try {
-        const {query} = req.query;
-        if (!query) {
-            return res.status(500).json({ success: false, message: 'Please enter search params' });
+        const { libname, localarea, city } = req.query;
+        
+        const libraries = await Libowner.find({ isallowed: true });
+        
+        const searchTerms = {};
+        if (libname) searchTerms.libname = libname;
+        if (localarea) searchTerms.localarea = localarea;
+        if (city) searchTerms.city = city;
+        
+        let results = libraries;
+        for (const [key, value] of Object.entries(searchTerms)) {
+            if (value.trim()) {
+                const fuseSubset = new Fuse(results, { keys: [key], threshold: 0.2 });
+                results = fuseSubset.search(value).map(item => item.item);
+            }
         }
-        else if (query.length <= 3) {
-            return res.status(500).json({ success: false, message: 'Search requires 4 characters...' });
-        }
-        else if (query.toLowerCase() === "library") {
-            return res.status(500).json({ success: false, message: 'Please search my full name' });
-        }
-
-        const libraries = await Libowner.find({isallowed: true});
-
-        const fuse = new Fuse(libraries, {
-            keys: ['localarea', 'libname', 'city'],
-            threshold: 0.4,
-        });
-
-        const results = query ? fuse.search(query).map(result => result.item) : [];
-
+        
         if (results.length > 0) {
-            res.status(200).json({ success: true, data: results });
+            return res.status(200).json({ success: true, data: results });
         } else {
-            res.status(404).json({ success: false, message: 'No matching libraries found.' });
+            return res.status(404).json({ success: false, message: "No libraries found" });
         }
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 });
 

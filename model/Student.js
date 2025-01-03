@@ -30,25 +30,6 @@ const StudentSchema = new Schema({
         type: Number,
         required: true
     },
-    requestedLibraries: {
-        type: [{
-            libraryId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Libowner', // Reference to the library schema
-                required: true,
-            },
-            requestDate: {
-                type: Date,
-                default: Date.now, // Defaults to the current date
-            },
-            status: {
-                type: String,
-                enum: ['Pending', 'Approved', 'Rejected'],
-                default: 'Pending', // Default status for new requests
-            },
-        }],
-        default: [], // Default to an empty array
-    },
     subscriptionDetails: {
         type: [{
             libraryId: {
