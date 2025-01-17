@@ -63,7 +63,7 @@ router.get('/searchlib', async (req, res) => {
         let results = libraries;
         for (const [key, value] of Object.entries(searchTerms)) {
             if (value.trim()) {
-                const fuseSubset = new Fuse(results, { keys: [key], threshold: 0.2 });
+                const fuseSubset = new Fuse(results, { keys: [key], threshold: 0.3 });
                 results = fuseSubset.search(value).map(item => item.item);
             }
         }

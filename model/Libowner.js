@@ -78,7 +78,7 @@ const LibownerSchema = new Schema({
                                         isBooked: { type: Boolean, default: false }
                                     }
                                 ],
-                                default: Array(80).fill({
+                                default: Array(2).fill({
                                     student: null,
                                     gender: 'boy',
                                     isBooked: false
@@ -103,7 +103,7 @@ const LibownerSchema = new Schema({
                             stTime: '12',
                             endTime: '17',
                             price: [
-                                { actualPrice: 700, discountPrice: 500, duration: '1 Month' }
+                                { actualPrice: 1000, discountPrice: 800, duration: '1 Month' }
                             ],
                             numberOfSeats: Array(2).fill({
                                 student: null,
@@ -115,9 +115,8 @@ const LibownerSchema = new Schema({
                             stTime: '17',
                             endTime: '21',
                             price: [
-                                { actualPrice: 700, discountPrice: 500, duration: '1 Month' }
+                                { actualPrice: 800, discountPrice: 650, duration: '1 Month' }
                             ],
-                            discountPrice: 600,
                             numberOfSeats: Array(2).fill({
                                 student: null,
                                 gender: 'boy',
@@ -147,7 +146,7 @@ const LibownerSchema = new Schema({
                         stTime: '12',
                         endTime: '17',
                         price: [
-                            { actualPrice: 700, discountPrice: 500, duration: '1 Month' }
+                            { actualPrice: 1000, discountPrice: 800, duration: '1 Month' }
                         ],
                         numberOfSeats: Array(2).fill({
                             student: null,
@@ -159,7 +158,7 @@ const LibownerSchema = new Schema({
                         stTime: '17',
                         endTime: '21',
                         price: [
-                            { actualPrice: 700, discountPrice: 500, duration: '1 Month' }
+                            { actualPrice: 800, discountPrice: 650, duration: '1 Month' }
                         ],
                         numberOfSeats: Array(2).fill({
                             student: null,

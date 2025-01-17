@@ -1,7 +1,9 @@
 import dotenv from 'dotenv';
 import express from 'express';
-import fetchuser, { fetchIsAdmin } from '../middleware/fetchuser.js';
+import fetchuser, { fetchIsStudent } from '../middleware/fetchuser.js';
 import Student from '../model/Student.js';
+import Libowner from '../model/Libowner.js';
+import RequestedLibrary from '../model/RequestedLibrary.js';
 
 dotenv.config();
 
@@ -55,6 +57,80 @@ router.put('/updateprofile', fetchuser, async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 
+});
+
+// Route 3 : Create user using : POST "/student/request-library"
+router.post('/request-library', fetchuser, fetchIsStudent, async (req, res) => {
+    try {
+        const { libraryId, studentId, idxFloor, idxShift, idxSeatSelected } = req.body;
+
+        // Fetch the library details
+        const library = await Libowner.findById(libraryId);
+
+        if (!library) {
+            return res.status(404).json({ message: 'Library not found' });
+        }
+
+        const floor = library.floors[idxFloor];
+        const selectedShift = floor.shifts[idxShift];
+        const seat = selectedShift.numberOfSeats[idxSeatSelected];
+
+        // Check if the seat is already booked in the selected shift
+        if (seat.isBooked) {
+            return res.status(400).json({ success: false, message: "Seat is already booked in the selected shift." });
+        }
+
+        // Check for overlapping shifts
+        const selectedStartTime = parseInt(selectedShift.stTime, 10);
+        const selectedEndTime = parseInt(selectedShift.endTime, 10);
+
+        for (const [index, shift] of floor.shifts.entries()) {
+            if (index !== idxShift) {
+                const shiftStartTime = parseInt(shift.stTime, 10);
+                const shiftEndTime = parseInt(shift.endTime, 10);
+
+                const isOverlap =
+                    (selectedStartTime >= shiftStartTime && selectedStartTime < shiftEndTime) ||
+                    (selectedEndTime > shiftStartTime && selectedEndTime <= shiftEndTime) ||
+                    (shiftStartTime >= selectedStartTime && shiftEndTime <= selectedEndTime);
+
+                if (isOverlap && shift.numberOfSeats[idxSeatSelected].isBooked) {
+                    return res.status(400).json({ success: false, message: `Seat is booked in another overlapping shift (Shift ${index + 1}).` });
+                }
+            }
+        }
+
+        // Check if the student has already requested the same seat
+        const existingRequest = await RequestedLibrary.findOne({
+            studentId,
+            libraryId,
+            idxFloor,
+            idxShift,
+            idxSeatSelected
+        });
+
+        if (existingRequest && existingRequest.status === "Pending") {
+            return res.status(400).json({ success: false, message: 'You have already requested this seat.' });
+        }
+        else if (existingRequest && existingRequest.status === "Rejected") {
+            return res.status(400).json({ success: false, message: 'You have already requested this seat but your request was rejected.' });
+        }
+
+        // Create a new request
+        const request = new RequestedLibrary({
+            studentId,
+            libraryId,
+            idxFloor,
+            idxShift,
+            idxSeatSelected,
+        });
+
+        await request.save();
+
+        res.status(200).json({ success: true, message: "Seat request submitted successfully! Wait for approval." });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 });
 
 export default router;

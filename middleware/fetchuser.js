@@ -19,6 +19,21 @@ export const fetchIsAdmin = async (req, res, next)=>{
 
 }
 
+export const fetchIsStudent = async (req, res, next)=>{
+    try {
+        if(req.user.type === "student"){
+            next();
+            return;
+        }
+        else{
+            return res.status(500).json({ success: false, message: "Not Allowed: Student Only" })
+        }
+    } catch (error) {
+        res.status(401).json({success: false, message: "Server Error: Try again later!"});
+    }
+
+}
+
 export const fetchIsAllowed = async (req, res, next)=>{
     try {
         if(req.user.type === "editor"){

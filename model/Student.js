@@ -50,7 +50,7 @@ const StudentSchema = new Schema({
     },
 });
 
-const Student = mongoose.model('student', StudentSchema);
+const Student = mongoose.model('Student', StudentSchema);
 Student.createIndexes();
 
 export default Student;

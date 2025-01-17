@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
-const RequestedLibrary = new Schema({
+const RequestedLibrarySchema = new Schema({
     studentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Student',
@@ -12,9 +12,24 @@ const RequestedLibrary = new Schema({
         ref: 'Libowner',
         required: true,
     },
+    idxFloor: {
+        type: Number,
+        required: true,
+    },
+    idxShift: {
+        type: Number,
+        required: true,
+    },
+    idxSeatSelected: {
+        type: Number,
+        required: true,
+    },
     requestDate: {
         type: Date,
         default: Date.now,
+        require: true,
+        get: (timestamp) => timestamp.getTime(),
+        set: (timestamp) => new Date(timestamp)
     },
     status: {
         type: String,
@@ -23,7 +38,7 @@ const RequestedLibrary = new Schema({
     },
 });
 
-const Student = mongoose.model('Requestedlibrary', StudentSchema);
-Student.createIndexes();
+const RequestedLibrary = mongoose.model('Requestedlibrary', RequestedLibrarySchema);
+RequestedLibrary.createIndexes();
 
 export default RequestedLibrary;
