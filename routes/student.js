@@ -9,7 +9,7 @@ dotenv.config();
 
 const router = express.Router();
 
-// Route 1 : Get admin details using : GET "/student/getstudent"
+// Route 1 : Get student using : GET "/student/getstudent"
 router.get('/getstudent', fetchuser, async (req, res) => {
     let success = false;
 
@@ -28,7 +28,7 @@ router.get('/getstudent', fetchuser, async (req, res) => {
 
 });
 
-// Route 2 : Create user using : POST "/student/updateprofile"
+// Route 2 : Updation of profile using : POST "/student/updateprofile"
 router.put('/updateprofile', fetchuser, async (req, res) => {
     let success = false;
 
@@ -59,7 +59,7 @@ router.put('/updateprofile', fetchuser, async (req, res) => {
 
 });
 
-// Route 3 : Create user using : POST "/student/request-library"
+// Route 3 : Sending request using : POST "/student/request-library"
 router.post('/request-library', fetchuser, fetchIsStudent, async (req, res) => {
     try {
         const { libraryId, studentId, idxFloor, idxShift, idxSeatSelected } = req.body;
@@ -133,10 +133,10 @@ router.post('/request-library', fetchuser, fetchIsStudent, async (req, res) => {
     }
 });
 
-// Route 4 : Get request using : GET "/student/getrequest"
+// Route 4 : Get requests using : GET "/student/getrequest"
 router.get('/getrequest/:id', fetchuser, fetchIsStudent, async (req, res) => {
     try {
-        const requests = await RequestedLibrary.find({ studentId: req.params.id }).populate('libraryId', 'libname localarea city state googlemap contactnum').exec();
+        const requests = await RequestedLibrary.find({ studentId: req.params.id }).populate('libraryId', 'libname contactnum').exec();
 
         if (requests.length > 0) {
             res.status(200).json({ success: true, message: 'Library requests fetched successfully.', data: requests });
@@ -146,7 +146,25 @@ router.get('/getrequest/:id', fetchuser, fetchIsStudent, async (req, res) => {
         }
 
     } catch (error) {
-        res.status(500).json({ success: false, message: `backend error ${error.message}` });
+        res.status(500).json({ success: false, message: "Internal server error occured!" });
+    }
+});
+
+// Route 5 : Delete request using : GET "/student/deleterequest"
+router.delete('/deleterequest/:id', fetchuser, fetchIsStudent, async (req, res) => {
+    try {
+        const request = await RequestedLibrary.findById(req.params.id);
+
+        if (!request) {
+            return res.status(400).json({ success: false, message: 'Request not found' });
+        }
+        
+        await RequestedLibrary.findByIdAndDelete(req.params.id);
+
+        res.status(200).json({ success: true, message: 'Request deleted successfully' });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Internal server error occured!" });
     }
 });
 
