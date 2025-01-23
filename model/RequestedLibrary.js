@@ -28,8 +28,8 @@ const RequestedLibrarySchema = new Schema({
         type: Date,
         default: Date.now,
         require: true,
-        get: (timestamp) => timestamp.getTime(),
-        set: (timestamp) => new Date(timestamp)
+        get: (requestDate) => requestDate.getTime(),
+        set: (requestDate) => new Date(requestDate)
     },
     status: {
         type: String,

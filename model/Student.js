@@ -39,14 +39,14 @@ const StudentSchema = new Schema({
             },
             subscriptionDate: {
                 type: Date,
-                default: Date.now, // Defaults to the current date
+                default: Date.now,
             },
             expiryDate: {
                 type: Date,
                 required: true,
             },
         }],
-        default: [], // Default to an empty array
+        default: [],
     },
 });
 

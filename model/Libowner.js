@@ -176,7 +176,7 @@ const LibownerSchema = new Schema({
     }
 });
 
-const Libowner = mongoose.model('libowner', LibownerSchema);
+const Libowner = mongoose.model('Libowner', LibownerSchema);
 Libowner.createIndexes();
 
 export default Libowner;

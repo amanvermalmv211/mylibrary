@@ -3,6 +3,7 @@ import express from 'express';
 import Libowner from '../model/Libowner.js';
 import fetchuser, { fetchIsAllowed } from '../middleware/fetchuser.js';
 import RequestedLibrary from '../model/RequestedLibrary.js';
+import Student from '../model/Student.js';
 
 dotenv.config();
 
@@ -65,7 +66,7 @@ router.put('/updateprofile', fetchuser, fetchIsAllowed, async (req, res) => {
 });
 
 // Route 3 : Get student's request using : GET "/libowner/joinrequest"
-router.get('/joinrequest/:id', async (req, res) => {
+router.get('/joinrequest/:id', fetchuser, fetchIsAllowed, async (req, res) => {
     try {
         const requests = await RequestedLibrary.find({ libraryId: req.params.id, status: "Pending" }).populate('studentId', 'name gender city contactnum').exec();
 
@@ -82,7 +83,7 @@ router.get('/joinrequest/:id', async (req, res) => {
 });
 
 // Route 4 : Reject student's request using : DELETE "/libowner/rejectrequest"
-router.delete('/rejectrequest', async (req, res) => {
+router.delete('/rejectrequest', fetchuser, fetchIsAllowed, async (req, res) => {
     try {
         const data = req.body.data;
         const requests = await RequestedLibrary.findOne({ libraryId: data.libraryId, studentId: data.studentId, idxFloor: data.idxFloor, idxShift: data.idxShift, idxSeatSelected: data.idxSeatSelected });
@@ -90,7 +91,7 @@ router.delete('/rejectrequest', async (req, res) => {
         if (!requests) {
             return res.status(404).json({ success: false, message: 'Request not found' });
         }
-        
+
         requests.status = "Rejected";
         await requests.save();
 
@@ -101,5 +102,71 @@ router.delete('/rejectrequest', async (req, res) => {
         console.log(error.message)
     }
 });
+
+// Route 5 : Approve student's request using : POST "/libowner/approve-request"
+router.post('/approve-request', fetchuser, fetchIsAllowed, async (req, res) => {
+    try {
+        const { requestId, subsDays } = req.body;
+
+        const request = await RequestedLibrary.findById(requestId);
+        if (!request) {
+            return res.status(404).json({ success: false, message: 'Request not found' });
+        }
+
+        const { studentId, libraryId, idxFloor, idxShift, idxSeatSelected } = request;
+
+        const library = await Libowner.findById(libraryId);
+        if (!library) {
+            return res.status(404).json({ success: false, message: 'Library not found' });
+        }
+
+        const student = await Student.findById(studentId);
+        if (!student) {
+            return res.status(404).json({ success: false, message: 'Student not found' });
+        }
+
+        const seat = library.floors[idxFloor].shifts[idxShift].numberOfSeats[idxSeatSelected];
+        if (seat.isBooked) {
+            return res.status(400).json({ success: false, message: 'Oops! Seat is already booked' });
+        }
+
+        if (seat.gender !== student.gender) {
+            return res.status(400).json({ success: false, message: `Gender mismatch: Seat is for ${seat.gender}s only` });
+        }
+
+        if (student.subscriptionDetails.length >= 3) {
+            return res.status(400).json({ success: false, message: 'Student already has 3 active subscriptions' });
+        }
+
+        seat.isBooked = true;
+        seat.student = studentId;
+        await library.save();
+
+        if (!subsDays || isNaN(Date.parse(subsDays))) {
+            return res.status(400).json({ success: false, message: "Invalid expiry date provided." });
+        }
+
+        const expiryDate = new Date(subsDays);
+
+        const currentDate = new Date();
+        if (expiryDate <= currentDate) {
+            return res.status(400).json({ success: false, message: "Expiry date must be in the future." });
+        }
+
+        student.subscriptionDetails.push({
+            libraryId,
+            subscriptionDate: currentDate,
+            expiryDate: expiryDate,
+        });
+        await student.save();
+
+        await RequestedLibrary.findByIdAndDelete(requestId);
+
+        res.status(200).json({ success: true, message: 'Request approved successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 
 export default router;

@@ -133,4 +133,21 @@ router.post('/request-library', fetchuser, fetchIsStudent, async (req, res) => {
     }
 });
 
+// Route 4 : Get request using : GET "/student/getrequest"
+router.get('/getrequest/:id', fetchuser, fetchIsStudent, async (req, res) => {
+    try {
+        const requests = await RequestedLibrary.find({ studentId: req.params.id }).populate('libraryId', 'libname localarea city state googlemap contactnum').exec();
+
+        if (requests.length > 0) {
+            res.status(200).json({ success: true, message: 'Library requests fetched successfully.', data: requests });
+        }
+        else {
+            res.status(400).json({ success: false, message: 'There is no request' });
+        }
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: `backend error ${error.message}` });
+    }
+});
+
 export default router;

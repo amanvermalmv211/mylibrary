@@ -62,7 +62,7 @@ async function sendOTP(req, res) {
     } catch (err) {
         return res.status(500).json({
             success: false,
-            message: "Server error occured, Please try again!"
+            message: err.message
         });
     }
 
