@@ -37,6 +37,22 @@ const StudentSchema = new Schema({
                 ref: 'Libowner',
                 required: true,
             },
+            idxFloor: {
+                type: Date,
+                default: Date.now,
+            },
+            idxShift: {
+                type: Date,
+                default: Date.now,
+            },
+            idxSeatSelected: {
+                type: Date,
+                default: Date.now,
+            },
+            priceDetails: {
+                type: Date,
+                default: Date.now,
+            },
             subscriptionDate: {
                 type: Date,
                 default: Date.now,

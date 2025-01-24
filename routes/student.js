@@ -14,7 +14,12 @@ router.get('/getstudent', fetchuser, async (req, res) => {
     let success = false;
 
     try {
-        let student = await Student.findOne({ userId: req.user.id });
+        const student = await Student.findOne({ userId: req.user.id })
+            .populate({
+                path: 'subscriptionDetails.libraryId',
+                select: 'libname contactnum libcontactnum googlemap'
+            });
+
         if (!student) {
             return res.status(400).json({ success, message: "Student not found" })
         }
@@ -62,7 +67,7 @@ router.put('/updateprofile', fetchuser, async (req, res) => {
 // Route 3 : Sending request using : POST "/student/request-library"
 router.post('/request-library', fetchuser, fetchIsStudent, async (req, res) => {
     try {
-        const { libraryId, studentId, idxFloor, idxShift, idxSeatSelected } = req.body;
+        const { libraryId, studentId, gender, idxFloor, idxShift, idxSeatSelected } = req.body;
 
         // Fetch the library details
         const library = await Libowner.findById(libraryId);
@@ -78,6 +83,10 @@ router.post('/request-library', fetchuser, fetchIsStudent, async (req, res) => {
         // Check if the seat is already booked in the selected shift
         if (seat.isBooked) {
             return res.status(400).json({ success: false, message: "Seat is already booked in the selected shift." });
+        }
+
+        if (seat.gender !== gender) {
+            return res.status(400).json({ success: false, message: `Gender mismatch: Seat is for ${seat.gender}s only` });
         }
 
         // Check for overlapping shifts
