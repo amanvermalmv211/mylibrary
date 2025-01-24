@@ -139,14 +139,14 @@ router.get('/getrequest/:id', fetchuser, fetchIsStudent, async (req, res) => {
         const requests = await RequestedLibrary.find({ studentId: req.params.id }).populate('libraryId', 'libname contactnum').exec();
 
         if (requests.length > 0) {
-            res.status(200).json({ success: true, message: 'Library requests fetched successfully.', data: requests });
+            res.status(200).json({ success: true, data: requests });
         }
         else {
-            res.status(400).json({ success: false, message: 'There is no request' });
+            res.status(400).json({ success: false });
         }
 
     } catch (error) {
-        res.status(500).json({ success: false, message: "Internal server error occured!" });
+        res.status(500).json({ success: false });
     }
 });
 
@@ -158,7 +158,7 @@ router.delete('/deleterequest/:id', fetchuser, fetchIsStudent, async (req, res) 
         if (!request) {
             return res.status(400).json({ success: false, message: 'Request not found' });
         }
-        
+
         await RequestedLibrary.findByIdAndDelete(req.params.id);
 
         res.status(200).json({ success: true, message: 'Request deleted successfully' });

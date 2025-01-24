@@ -83,23 +83,21 @@ router.get('/joinrequest/:id', fetchuser, fetchIsAllowed, async (req, res) => {
 });
 
 // Route 4 : Reject student's request using : DELETE "/libowner/rejectrequest"
-router.delete('/rejectrequest', fetchuser, fetchIsAllowed, async (req, res) => {
+router.delete('/rejectrequest/:id', fetchuser, fetchIsAllowed, async (req, res) => {
     try {
-        const data = req.body.data;
-        const requests = await RequestedLibrary.findOne({ libraryId: data.libraryId, studentId: data.studentId, idxFloor: data.idxFloor, idxShift: data.idxShift, idxSeatSelected: data.idxSeatSelected });
+        const request = await RequestedLibrary.findById(req.params.id);
 
-        if (!requests) {
+        if (!request) {
             return res.status(404).json({ success: false, message: 'Request not found' });
         }
 
-        requests.status = "Rejected";
-        await requests.save();
+        request.status = "Rejected";
+        await request.save();
 
         res.status(200).json({ success: true, message: 'Request is reject successfully.' });
 
     } catch (error) {
-        res.status(500).json({ success: false, message: `backend error ${error.message}` });
-        console.log(error.message)
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
 });
 
@@ -164,7 +162,7 @@ router.post('/approve-request', fetchuser, fetchIsAllowed, async (req, res) => {
 
         res.status(200).json({ success: true, message: 'Request approved successfully' });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
 });
 
