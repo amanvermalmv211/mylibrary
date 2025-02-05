@@ -4,6 +4,7 @@ import Admin from '../model/Superadmin.js';
 import fetchuser, { fetchIsAdmin } from '../middleware/fetchuser.js';
 import Libowner from '../model/Libowner.js';
 import User from '../model/User.js';
+import Editor from '../model/Editor.js';
 
 dotenv.config();
 
@@ -130,6 +131,42 @@ router.put('/updatelibrary/:id', fetchuser, fetchIsAdmin, async (req, res) => {
         console.error(error);
         res.status(500).json({ success: false, message: 'Server error. Unable to update library details.' });
     }
+});
+
+// Route 5 : Get requested editors using : GET "/superadmin/getrequest/editors"
+router.get('/getrequest/editors', fetchuser, fetchIsAdmin, async (req, res) => {
+    let success = false;
+
+    try {
+        let libdata = await Editor.find({ isallowed: false });
+        if (!libdata) {
+            return res.status(400).json({ success, message: "There is no request!" })
+        }
+
+        res.status(200).json({ success: true, data: libdata })
+    }
+    catch (err) {
+        res.status(500).json({ success: false, message: "GetRequest: Unable to get requests!" });
+    }
+
+});
+
+// Route 6 : Approve request for editors using : GET "/superadmin/init/editor"
+router.get('/init/editor', fetchuser, fetchIsAdmin, async (req, res) => {
+    let success = false;
+
+    try {
+        let libdata = await Editor.find({ isallowed: false });
+        if (!libdata) {
+            return res.status(400).json({ success, message: "There is no request!" })
+        }
+
+        res.status(200).json({ success: true, data: libdata })
+    }
+    catch (err) {
+        res.status(500).json({ success: false, message: "GetRequest: Unable to get requests!" });
+    }
+
 });
 
 export default router;

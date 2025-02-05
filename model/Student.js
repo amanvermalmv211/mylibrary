@@ -38,20 +38,20 @@ const StudentSchema = new Schema({
                 required: true,
             },
             idxFloor: {
-                type: Date,
-                default: Date.now,
+                type: Number,
+                required: true,
             },
             idxShift: {
-                type: Date,
-                default: Date.now,
+                type: Number,
+                required: true,
             },
             idxSeatSelected: {
-                type: Date,
-                default: Date.now,
+                type: Number,
+                required: true,
             },
             priceDetails: {
-                type: Date,
-                default: Date.now,
+                type: Number,
+                required: true,
             },
             subscriptionDate: {
                 type: Date,

@@ -40,7 +40,11 @@ router.put('/updateprofile', fetchuser, async (req, res) => {
     const stdDetails = req.body;
 
     try {
-        let std = await Student.findOne({ userId: req.user.id });
+        let std = await Student.findOne({ userId: req.user.id })
+            .populate({
+                path: 'subscriptionDetails.libraryId',
+                select: 'libname contactnum libcontactnum googlemap'
+            });
         if (!std) {
             return res.status(400).json({ success, message: "Student not found" })
         }
