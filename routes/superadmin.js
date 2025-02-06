@@ -138,12 +138,12 @@ router.get('/getrequest/editors', fetchuser, fetchIsAdmin, async (req, res) => {
     let success = false;
 
     try {
-        let libdata = await Editor.find({ isallowed: false });
-        if (!libdata) {
+        let edtData = await Editor.find({ isallowed: false });
+        if (!edtData) {
             return res.status(400).json({ success, message: "There is no request!" })
         }
 
-        res.status(200).json({ success: true, data: libdata })
+        res.status(200).json({ success: true, data: edtData })
     }
     catch (err) {
         res.status(500).json({ success: false, message: "GetRequest: Unable to get requests!" });
@@ -151,20 +151,28 @@ router.get('/getrequest/editors', fetchuser, fetchIsAdmin, async (req, res) => {
 
 });
 
-// Route 6 : Approve request for editors using : GET "/superadmin/init/editor"
-router.get('/init/editor', fetchuser, fetchIsAdmin, async (req, res) => {
+// Route 6 : Approve request for editors using : GET "/superadmin/initeditor/:id"
+router.get('/initeditor/:id', fetchuser, fetchIsAdmin, async (req, res) => {
     let success = false;
 
     try {
-        let libdata = await Editor.find({ isallowed: false });
-        if (!libdata) {
+        const editor = await Editor.findById(req.params.id);
+        if (!editor) {
             return res.status(400).json({ success, message: "There is no request!" })
         }
 
-        res.status(200).json({ success: true, data: libdata })
+        editor.isallowed = true;
+        await editor.save();
+
+        const newUser = {}
+        newUser.isallowed = true;
+
+        await User.findByIdAndUpdate(editor.userId, { $set: newUser }, { new: true });
+
+        res.status(200).json({ success: true, message: "Editor initiated successfully" })
     }
     catch (err) {
-        res.status(500).json({ success: false, message: "GetRequest: Unable to get requests!" });
+        res.status(500).json({ success: false, message: err.message });
     }
 
 });
