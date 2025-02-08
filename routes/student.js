@@ -10,7 +10,7 @@ dotenv.config();
 const router = express.Router();
 
 // Route 1 : Get student using : GET "/student/getstudent"
-router.get('/getstudent', fetchuser, async (req, res) => {
+router.get('/getstudent', fetchuser, fetchIsStudent, async (req, res) => {
     let success = false;
 
     try {
@@ -34,7 +34,7 @@ router.get('/getstudent', fetchuser, async (req, res) => {
 });
 
 // Route 2 : Updation of profile using : POST "/student/updateprofile"
-router.put('/updateprofile', fetchuser, async (req, res) => {
+router.put('/updateprofile', fetchuser, fetchIsStudent, async (req, res) => {
     let success = false;
 
     const stdDetails = req.body;

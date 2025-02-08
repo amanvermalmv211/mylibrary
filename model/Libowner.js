@@ -7,8 +7,8 @@ const LibownerSchema = new Schema({
         required: true,
     },
     profileImg: {
-        type: Number,
-        default: 0
+        type: String,
+        default: '0'
     },
     ownername: {
         type: String,
@@ -43,7 +43,7 @@ const LibownerSchema = new Schema({
         required: true
     },
     pin: {
-        type: String,
+        type: Number,
         required: true
     },
     googlemap: {
@@ -56,18 +56,19 @@ const LibownerSchema = new Schema({
                 shifts: {
                     type: [
                         {
-                            stTime: { type: String, default: '7' },
-                            endTime: { type: String, default: '12' },
+                            stTime: { type: Number, default: 7 },
+                            endTime: { type: Number, default: 12 },
+                            description: { type: String, default: '' },
                             price: {
                                 type: [
                                     {
                                         actualPrice: { type: Number, default: 700 },
                                         discountPrice: { type: Number, default: 500 },
-                                        duration: { type: String, default: '1 Month' }
+                                        duration: { type: String, default: '30 Days' }
                                     }
                                 ],
                                 default: [
-                                    { actualPrice: 700, discountPrice: 500, duration: '1 Month' }
+                                    { actualPrice: 700, discountPrice: 500, duration: '30 Days' }
                                 ]
                             },
                             numberOfSeats: {
@@ -88,10 +89,11 @@ const LibownerSchema = new Schema({
                     ],
                     default: [
                         {
-                            stTime: '7',
-                            endTime: '12',
+                            stTime: 7,
+                            endTime: 12,
+                            description: '',
                             price: [
-                                { actualPrice: 700, discountPrice: 500, duration: '1 Month' }
+                                { actualPrice: 700, discountPrice: 500, duration: '30 Days' }
                             ],
                             numberOfSeats: Array(2).fill({
                                 student: null,
@@ -100,10 +102,11 @@ const LibownerSchema = new Schema({
                             })
                         },
                         {
-                            stTime: '12',
-                            endTime: '17',
+                            stTime: 12,
+                            endTime: 17,
+                            description: '',
                             price: [
-                                { actualPrice: 1000, discountPrice: 800, duration: '1 Month' }
+                                { actualPrice: 1000, discountPrice: 800, duration: '30 Days' }
                             ],
                             numberOfSeats: Array(2).fill({
                                 student: null,
@@ -112,10 +115,11 @@ const LibownerSchema = new Schema({
                             })
                         },
                         {
-                            stTime: '17',
-                            endTime: '21',
+                            stTime: 17,
+                            endTime: 21,
+                            description: '',
                             price: [
-                                { actualPrice: 800, discountPrice: 650, duration: '1 Month' }
+                                { actualPrice: 800, discountPrice: 650, duration: '30 Days' }
                             ],
                             numberOfSeats: Array(2).fill({
                                 student: null,
@@ -131,10 +135,11 @@ const LibownerSchema = new Schema({
             {
                 shifts: [
                     {
-                        stTime: '7',
-                        endTime: '12',
+                        stTime: 7,
+                        endTime: 12,
+                        description: '',
                         price: [
-                            { actualPrice: 700, discountPrice: 500, duration: '1 Month' }
+                            { actualPrice: 700, discountPrice: 500, duration: '30 Days' }
                         ],
                         numberOfSeats: Array(2).fill({
                             student: null,
@@ -143,10 +148,12 @@ const LibownerSchema = new Schema({
                         })
                     },
                     {
-                        stTime: '12',
-                        endTime: '17',
+                        stTime: 12,
+                        endTime: 17,
+                        description: '',
                         price: [
-                            { actualPrice: 1000, discountPrice: 800, duration: '1 Month' }
+                            { actualPrice: 1000, discountPrice: 800, duration: '30 Days' },
+                            { actualPrice: 2000, discountPrice: 1500, duration: '60 Days' }
                         ],
                         numberOfSeats: Array(2).fill({
                             student: null,
@@ -155,10 +162,11 @@ const LibownerSchema = new Schema({
                         })
                     },
                     {
-                        stTime: '17',
-                        endTime: '21',
+                        stTime: 17,
+                        endTime: 21,
+                        description: '',
                         price: [
-                            { actualPrice: 800, discountPrice: 650, duration: '1 Month' }
+                            { actualPrice: 800, discountPrice: 650, duration: '30 Days' }
                         ],
                         numberOfSeats: Array(2).fill({
                             student: null,

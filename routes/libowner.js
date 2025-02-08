@@ -56,6 +56,7 @@ router.put('/updateprofile', fetchuser, fetchIsAllowed, async (req, res) => {
         if (Array.isArray(libraryDetails.floors)) {
             library.floors = libraryDetails.floors;
         }
+        
         await library.save();
 
         res.status(200).json({ success: true, message: 'Library details updated successfully', data: library });
@@ -132,13 +133,9 @@ router.post('/approve-request', fetchuser, fetchIsAllowed, async (req, res) => {
             return res.status(400).json({ success: false, message: `Gender mismatch: Seat is for ${seat.gender}s only` });
         }
 
-        if (student.subscriptionDetails.length >= 3) {
-            return res.status(400).json({ success: false, message: 'Student already has 3 active subscriptions' });
+        if (student.subscriptionDetails.length >= 2) {
+            return res.status(400).json({ success: false, message: 'Student already has 2 active subscriptions' });
         }
-
-        seat.isBooked = true;
-        seat.student = studentId;
-        await library.save();
 
         if (!subsDays || isNaN(Date.parse(subsDays))) {
             return res.status(400).json({ success: false, message: "Invalid expiry date provided." });
@@ -156,7 +153,12 @@ router.post('/approve-request', fetchuser, fetchIsAllowed, async (req, res) => {
             subscriptionDate: currentDate,
             expiryDate: expiryDate,
         });
+
         await student.save();
+
+        seat.isBooked = true;
+        seat.student = studentId;
+        await library.save();
 
         await RequestedLibrary.findByIdAndDelete(requestId);
 

@@ -56,10 +56,15 @@ const StudentSchema = new Schema({
             subscriptionDate: {
                 type: Date,
                 default: Date.now,
+                require: true,
+                get: (timestamp) => timestamp.getTime(),
+                set: (timestamp) => new Date(timestamp)
             },
             expiryDate: {
                 type: Date,
-                required: true,
+                require: true,
+                get: (timestamp) => timestamp.getTime(),
+                set: (timestamp) => new Date(timestamp)
             },
         }],
         default: [],
