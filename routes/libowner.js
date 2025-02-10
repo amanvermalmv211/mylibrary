@@ -150,6 +150,10 @@ router.post('/approve-request', fetchuser, fetchIsAllowed, async (req, res) => {
 
         student.subscriptionDetails.push({
             libraryId,
+            idxFloor: idxFloor,
+            idxShift: idxShift,
+            idxSeatSelected: idxSeatSelected,
+            priceDetails: "30 Days",
             subscriptionDate: currentDate,
             expiryDate: expiryDate,
         });
@@ -162,9 +166,9 @@ router.post('/approve-request', fetchuser, fetchIsAllowed, async (req, res) => {
 
         await RequestedLibrary.findByIdAndDelete(requestId);
 
-        res.status(200).json({ success: true, message: 'Request approved successfully' });
+        res.status(200).json({ success: true, message: 'Request approved successfully', data: library });
     } catch (error) {
-        res.status(500).json({ success: false, message: "Internal server error" });
+        res.status(500).json({ success: false, message: error.message });
     }
 });
 

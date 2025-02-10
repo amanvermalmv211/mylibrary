@@ -50,6 +50,10 @@ const LibownerSchema = new Schema({
         type: String,
         default: null
     },
+    ytvideo: {
+        type: [],
+        default: []
+    },
     floors: {
         type: [
             {

@@ -50,7 +50,7 @@ const StudentSchema = new Schema({
                 required: true,
             },
             priceDetails: {
-                type: Number,
+                type: String,
                 required: true,
             },
             subscriptionDate: {
