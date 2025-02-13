@@ -53,6 +53,10 @@ router.put('/updateprofile', fetchuser, fetchIsAllowed, async (req, res) => {
         if (libraryDetails.pin) library.pin = libraryDetails.pin;
         if (libraryDetails.googlemap) library.googlemap = libraryDetails.googlemap;
 
+        if (Array.isArray(libraryDetails.ytvideo)) {
+            library.ytvideo = libraryDetails.ytvideo;
+        }
+
         if (Array.isArray(libraryDetails.floors)) {
             library.floors = libraryDetails.floors;
         }
