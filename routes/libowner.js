@@ -15,17 +15,26 @@ router.get('/getlibowner', fetchuser, fetchIsAllowed, async (req, res) => {
 
     try {
         let libowner = await Libowner.findOne({ userId: req.user.id });
+
         if (!libowner) {
-            return res.status(400).json({ success, message: "Libray owner not found" })
+            return res.status(404).json({ success, message: "Library owner not found" });
         }
 
-        res.status(200).json({ success: true, data: libowner })
+        libowner = await libowner.populate({
+            path: 'floors.shifts.numberOfSeats.student',
+            select: 'name contactnum aadharnum localarea city subscriptionDetails',
+            populate: {
+                path: 'subscriptionDetails.libraryId',
+                match: { _id: libowner._id },
+                select: 'libname'
+            }
+        });
 
-    }
-    catch (err) {
-        res.status(500).json({ success: false, message: "Internal server error occured" });
-    }
+        res.status(200).json({ success: true, data: libowner });
 
+    } catch (err) {
+        res.status(500).json({ success: false, message: "Internal server error occurred" });
+    }
 });
 
 // Route 2 : Update user using : PUT "/libowner/updateprofile"
@@ -60,7 +69,7 @@ router.put('/updateprofile', fetchuser, fetchIsAllowed, async (req, res) => {
         if (Array.isArray(libraryDetails.floors)) {
             library.floors = libraryDetails.floors;
         }
-        
+
         await library.save();
 
         res.status(200).json({ success: true, message: 'Library details updated successfully', data: library });
@@ -170,7 +179,17 @@ router.post('/approve-request', fetchuser, fetchIsAllowed, async (req, res) => {
 
         await RequestedLibrary.findByIdAndDelete(requestId);
 
-        res.status(200).json({ success: true, message: 'Request approved successfully', data: library });
+        const libData = await library.populate({
+            path: 'floors.shifts.numberOfSeats.student',
+            select: 'name contactnum aadharnum localarea city subscriptionDetails',
+            populate: {
+                path: 'subscriptionDetails.libraryId',
+                match: { _id: library._id },
+                select: 'libname'
+            }
+        });
+
+        res.status(200).json({ success: true, message: 'Request approved successfully', data: libData });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

@@ -121,8 +121,9 @@ router.post('/verifyotp', async (req, res) => {
                     name: userdata.name,
                     gender: userdata.gender,
                     contactnum: userdata.contactnum,
-                    city: userdata.city,
-                    pin: userdata.pin
+                    aadharnum: userdata.aadharnum,
+                    localarea: userdata.localarea,
+                    city: userdata.city
                 })
             }
             else if (user.type === "libowner") {

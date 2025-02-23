@@ -18,17 +18,22 @@ const StudentSchema = new Schema({
         type: String,
         required: true
     },
+    localarea: {
+        type: String,
+        required: true,
+    },
     city: {
         type: String,
         required: true,
     },
-    pin: {
-        type: Number,
-        required: true
-    },
     contactnum: {
         type: Number,
         required: true
+    },
+    aadharnum: {
+        type: Number,
+        required: true,
+        default: 0
     },
     subscriptionDetails: {
         type: [{

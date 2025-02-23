@@ -78,7 +78,7 @@ const LibownerSchema = new Schema({
                             numberOfSeats: {
                                 type: [
                                     {
-                                        student: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+                                        student: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', default: null },
                                         gender: { type: String, default: 'boy', required: true },
                                         isBooked: { type: Boolean, default: false }
                                     }

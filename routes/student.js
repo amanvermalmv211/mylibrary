@@ -53,8 +53,8 @@ router.put('/updateprofile', fetchuser, fetchIsStudent, async (req, res) => {
         if (stdDetails.profileImg || stdDetails.profileImg === 0) std.profileImg = stdDetails.profileImg;
         if (stdDetails.name) std.name = stdDetails.name;
         if (stdDetails.contactnum) std.contactnum = stdDetails.contactnum;
+        if (stdDetails.localarea) std.localarea = stdDetails.localarea;
         if (stdDetails.city) std.city = stdDetails.city;
-        if (stdDetails.pin) std.pin = stdDetails.pin;
         if (stdDetails.gender) std.gender = stdDetails.gender;
 
         // Save updated std data
