@@ -54,6 +54,26 @@ const LibownerSchema = new Schema({
         type: [],
         default: []
     },
+    subscriptionDetails: {
+        subscriptionDate: {
+            type: Date,
+            default: Date.now,
+            require: true,
+            get: (subscriptionDate) => subscriptionDate.getTime(),
+            set: (subscriptionDate) => new Date(subscriptionDate)
+        },
+        expiryDate: {
+            type: Date,
+            default: () => {
+                const currentDate = new Date();
+                return new Date(currentDate.setDate(currentDate.getDate() + 30));
+            }
+        },
+        activeStd: {
+            type: Number,
+            default: 0
+        }
+    },
     floors: {
         type: [
             {
@@ -67,12 +87,11 @@ const LibownerSchema = new Schema({
                                 type: [
                                     {
                                         actualPrice: { type: Number, default: 700 },
-                                        discountPrice: { type: Number, default: 500 },
                                         duration: { type: String, default: '30 Days' }
                                     }
                                 ],
                                 default: [
-                                    { actualPrice: 700, discountPrice: 500, duration: '30 Days' }
+                                    { actualPrice: 700, duration: '30 Days' }
                                 ]
                             },
                             numberOfSeats: {
@@ -97,7 +116,7 @@ const LibownerSchema = new Schema({
                             endTime: 12,
                             description: '',
                             price: [
-                                { actualPrice: 700, discountPrice: 500, duration: '30 Days' }
+                                { actualPrice: 700, duration: '30 Days' }
                             ],
                             numberOfSeats: Array(2).fill({
                                 student: null,
@@ -110,7 +129,7 @@ const LibownerSchema = new Schema({
                             endTime: 17,
                             description: '',
                             price: [
-                                { actualPrice: 1000, discountPrice: 800, duration: '30 Days' }
+                                { actualPrice: 1000, duration: '30 Days' }
                             ],
                             numberOfSeats: Array(2).fill({
                                 student: null,
@@ -123,7 +142,7 @@ const LibownerSchema = new Schema({
                             endTime: 21,
                             description: '',
                             price: [
-                                { actualPrice: 800, discountPrice: 650, duration: '30 Days' }
+                                { actualPrice: 800, duration: '30 Days' }
                             ],
                             numberOfSeats: Array(2).fill({
                                 student: null,
@@ -143,7 +162,7 @@ const LibownerSchema = new Schema({
                         endTime: 12,
                         description: '',
                         price: [
-                            { actualPrice: 700, discountPrice: 500, duration: '30 Days' }
+                            { actualPrice: 700, duration: '30 Days' }
                         ],
                         numberOfSeats: Array(2).fill({
                             student: null,
@@ -156,8 +175,8 @@ const LibownerSchema = new Schema({
                         endTime: 17,
                         description: '',
                         price: [
-                            { actualPrice: 1000, discountPrice: 800, duration: '30 Days' },
-                            { actualPrice: 2000, discountPrice: 1500, duration: '60 Days' }
+                            { actualPrice: 1000, duration: '30 Days' },
+                            { actualPrice: 2000, duration: '60 Days' }
                         ],
                         numberOfSeats: Array(2).fill({
                             student: null,
@@ -170,7 +189,7 @@ const LibownerSchema = new Schema({
                         endTime: 21,
                         description: '',
                         price: [
-                            { actualPrice: 800, discountPrice: 650, duration: '30 Days' }
+                            { actualPrice: 800, duration: '30 Days' }
                         ],
                         numberOfSeats: Array(2).fill({
                             student: null,
@@ -182,7 +201,16 @@ const LibownerSchema = new Schema({
             }
         ]
     },
+    isReadTAC: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     isallowed: {
+        type: Boolean,
+        default: false
+    },
+    isPay: {
         type: Boolean,
         default: false
     }

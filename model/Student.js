@@ -7,8 +7,8 @@ const StudentSchema = new Schema({
         required: true,
     },
     profileImg: {
-        type: Number,
-        default: 0
+        type: String,
+        default: '0'
     },
     name: {
         type: String,
@@ -34,6 +34,11 @@ const StudentSchema = new Schema({
         type: Number,
         required: true,
         default: 0
+    },
+    isReadTAC: {
+        type: Boolean,
+        required: true,
+        default: false
     },
     subscriptionDetails: {
         type: [{
@@ -62,15 +67,25 @@ const StudentSchema = new Schema({
                 type: Date,
                 default: Date.now,
                 require: true,
-                get: (timestamp) => timestamp.getTime(),
-                set: (timestamp) => new Date(timestamp)
+                get: (subscriptionDate) => subscriptionDate.getTime(),
+                set: (subscriptionDate) => new Date(subscriptionDate)
             },
             expiryDate: {
                 type: Date,
                 require: true,
-                get: (timestamp) => timestamp.getTime(),
-                set: (timestamp) => new Date(timestamp)
+                get: (expiryDate) => expiryDate.getTime(),
+                set: (expiryDate) => new Date(expiryDate)
             },
+            blocked: {
+                type: Boolean,
+                default: false
+            },
+            emailSentDate: {
+                type: Date,
+                default: null,
+                get: (emailSentDate) => emailSentDate.getTime(),
+                set: (emailSentDate) => new Date(emailSentDate)
+            }
         }],
         default: [],
     },
