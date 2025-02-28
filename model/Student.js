@@ -32,8 +32,7 @@ const StudentSchema = new Schema({
     },
     aadharnum: {
         type: Number,
-        required: true,
-        default: 0
+        required: true
     },
     isReadTAC: {
         type: Boolean,
