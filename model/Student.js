@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 const StudentSchema = new Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true,
     },
     profileImg: {

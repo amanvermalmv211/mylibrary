@@ -28,18 +28,27 @@ cron.schedule('0 0 * * *', async () => {
     const students = await Student.find({
         'subscriptionDetails.expiryDate': { $lt: currentDate },
         'subscriptionDetails.blocked': false
-    }).populate('userId', 'email') // Get student email from User schema
-        .populate('subscriptionDetails.libraryId', 'libname userId floors');
+    })
+        .populate('userId', 'email') // Ensure this correctly fetches email
+        .populate('subscriptionDetails.libraryId', 'libname userId floors')
+        .lean(); // Convert documents into plain objects for easier handling
 
     for (let student of students) {
         let updatedSubscriptions = [];
         let sendEmail = false;
         const studentEmail = student.userId.email;
+        console.log("This is email of student: ", studentEmail);
+        console.log(student.subscriptionDetails);
+
+        console.log("Pass 1");
 
         for (let subs of student.subscriptionDetails) {
             if (subs.expiryDate < currentDate && !subs.blocked) {
                 const expiryDate = new Date(subs.expiryDate);
                 const daysSinceExpiry = (currentDate - expiryDate) / (1000 * 60 * 60 * 24);
+                console.log("Pass 2");
+                console.log(expiryDate);
+                console.log(daysSinceExpiry);
                 // const daysSinceExpiry = Math.floor((currentDate - subs.expiryDate) / (1000 * 60 * 60 * 24));
 
                 // Check if last notification was sent more than 5 days ago
@@ -55,27 +64,35 @@ cron.schedule('0 0 * * *', async () => {
                     // };
                     // await sgMail.send(studentMsg);
 
+                    console.log("Pass 3");
+
                     const stdmailOptions = {
                         from: 'amanvermalmv211@gmail.com',
                         to: studentEmail,
                         subject: `Your Subscription at ${subs.libraryId.libname} has Expired!`,
                         html: `<p>Your subscription expired on ${subs.expiryDate.toDateString()}. Please renew it to continue using the services.</p>`
                     }
+                    console.log("Pass 4");
                     await transporter.sendMail(stdmailOptions);
+                    console.log("Pass 5");
                 }
-
+                
                 // Update `isBooked` field in Libowner Schema (Only for first-time expiry)
                 const library = subs.libraryId;
                 if (library) {
+                    console.log("Pass 6");
                     const floor = library.floors[subs.idxFloor];
                     if (floor) {
+                        console.log("Pass 7");
                         const shift = floor.shifts[subs.idxShift];
                         if (shift) {
+                            console.log("Pass 8");
                             const seat = shift.numberOfSeats[subs.idxSeatSelected];
                             if (seat && seat.isBooked && String(seat.student) === String(student._id)) {
                                 seat.isBooked = false; // Mark the seat as available
                                 seat.student = null;   // Remove the student reference
                                 await library.save();  // Save changes to the database
+                                console.log("Pass 9");
                             }
                         }
                     }
@@ -90,26 +107,35 @@ cron.schedule('0 0 * * *', async () => {
                     seatDetails: `Floor ${subs.idxFloor}, Shift ${subs.idxShift}, Seat ${subs.idxSeatSelected}`
                 });
 
+                console.log("Pass 10")
+                
                 // If it's been more than 15 days, mark as blocked
                 if (daysSinceExpiry < 7) {
                     updatedSubscriptions.push(subs);
+                    console.log("Pass 11")
                 } else {
                     subs.blocked = true; // Mark as blocked after 15 days
                     updatedSubscriptions.push(subs);
+                    console.log("Pass 12")
                 }
             } else {
                 updatedSubscriptions.push(subs);
+                console.log("Pass 13")
             }
         }
-
+        
         // Update student subscriptions in DB
         student.subscriptionDetails = updatedSubscriptions;
+        console.log("Pass 14")
         if (sendEmail) await student.save();
+        console.log("Pass 15")
     }
 
     // Fetch library owners' emails and send notifications
     for (const ownerId in libownerNotifications) {
+        console.log("Pass 16")
         const owner = await Libowner.findById(ownerId).populate('userId', 'email');
+        console.log("Pass 17")
 
         if (owner) {
             // const ownerMsg = {
@@ -122,6 +148,8 @@ cron.schedule('0 0 * * *', async () => {
             // };
             // await sgMail.send(ownerMsg);
 
+            console.log("This is email of student: ", owner.userId.email);
+
             const ownmailOptions = {
                 from: 'amanvermalmv211@gmail.com',
                 to: owner.userId.email,
@@ -131,6 +159,7 @@ cron.schedule('0 0 * * *', async () => {
                 ).join('\n')}</p>`
             }
             await transporter.sendMail(ownmailOptions);
+            console.log("Pass 18")
         }
     }
 
