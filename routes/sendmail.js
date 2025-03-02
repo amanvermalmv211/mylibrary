@@ -16,7 +16,7 @@ cron.schedule('0 0 * * *', async () => {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: 'amanvermalmv211@gmail.com',
+            user: 'merilibrary.in@gmail.com',
             pass: process.env.MAIL_PASS
         }
     });
@@ -49,7 +49,7 @@ cron.schedule('0 0 * * *', async () => {
                                 subs.emailSentDate = currentDate;
 
                                 const stdmailOptions = {
-                                    from: 'amanvermalmv211@gmail.com',
+                                    from: 'merilibrary.in@gmail.com',
                                     to: studentEmail,
                                     subject: `Your Subscription at ${subs.libraryId.libname} has Expired!`,
                                     text: `Subscription Expired
@@ -89,7 +89,7 @@ cron.schedule('0 0 * * *', async () => {
                                         await library.save();
                                     }
                                 } catch (err) {
-                                    console.log("⚠️ Error updating library seat info:", err);
+                                    console.log("Error updating library seat info:", err);
                                 }
                             }
 
@@ -107,14 +107,14 @@ cron.schedule('0 0 * * *', async () => {
                         }
                         updatedSubscriptions.push(subs);
                     } catch (err) {
-                        console.log("⚠️ Error processing student subscription:", err);
+                        console.log("Error processing student subscription:", err);
                     }
                 }
 
                 student.subscriptionDetails = updatedSubscriptions;
                 if (sendEmail) await student.save();
             } catch (err) {
-                console.log("⚠️ Error processing student:", err);
+                console.log("Error processing student:", err);
             }
         }
 
@@ -123,7 +123,7 @@ cron.schedule('0 0 * * *', async () => {
                 const owner = await Libowner.findById(ownerId).populate('userId', 'email');
                 if (owner && owner.userId?.email) {
                     const ownmailOptions = {
-                        from: 'amanvermalmv211@gmail.com',
+                        from: 'merilibrary.in@gmail.com',
                         to: owner.userId.email,
                         subject: `Daily Subscription Expiry Report`,
                         text: `Subscription Expiry Notification (${owner.libname})
@@ -163,26 +163,24 @@ cron.schedule('0 0 * * *', async () => {
                     await transporter.sendMail(ownmailOptions);
                 }
             } catch (err) {
-                console.log("⚠️ Error sending email to library owner:", err);
+                console.log("Error sending email to library owner:", err);
             }
         }
     } catch (err) {
-        console.log("⚠️ Error fetching students from DB:", err);
+        console.log("Error fetching students from DB:", err);
     }
-    console.log("✅ Cron job completed");
 });
 
 async function sendOTP(req, res) {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: 'amanvermalmv211@gmail.com',
+            user: 'merilibrary.in@gmail.com',
             pass: process.env.MAIL_PASS
         }
     })
 
     const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
-    console.log(otp);
 
     const mailOptions = {
         from: 'amanvermalmv211@gmail.com',

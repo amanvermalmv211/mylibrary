@@ -25,6 +25,10 @@ router.post('/createuser', async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const secPass = await bcrypt.hash(req.body.password, salt);
 
+        if(req.body.type === "admin"){
+            return res.status(400).json({ success: false, message: "Admin is already" })
+        }
+
         // check whether the user with the email exists already.
         let user = await User.findOne({ email: req.body.email });
         if (user && user.isverified) {
