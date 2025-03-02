@@ -81,6 +81,8 @@ router.put('/updatelibrary/:id', fetchuser, fetchIsAdmin, async (req, res) => {
         // Update library details
         if (libraryDetails.ownername) library.ownername = libraryDetails.ownername;
         if (libraryDetails.libname) library.libname = libraryDetails.libname;
+        if (libraryDetails.isregistered) library.isregistered = libraryDetails.isregistered;
+        if (libraryDetails.registeredno) library.registeredno = libraryDetails.registeredno;
         if (libraryDetails.contactnum) library.contactnum = libraryDetails.contactnum;
         if (libraryDetails.libcontactnum) library.libcontactnum = libraryDetails.libcontactnum;
         if (libraryDetails.aadharnum) library.aadharnum = libraryDetails.aadharnum;

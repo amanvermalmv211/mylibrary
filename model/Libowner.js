@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 const LibownerSchema = new Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true,
     },
     profileImg: {
@@ -17,6 +18,14 @@ const LibownerSchema = new Schema({
     libname: {
         type: String,
         default: null
+    },
+    isregistered: {
+        type: Boolean,
+        default: false,
+    },
+    registeredno: {
+        type: String,
+        default: null,
     },
     contactnum: {
         type: Number,

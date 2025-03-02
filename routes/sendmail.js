@@ -6,13 +6,9 @@ import OTPVerification from '../model/OTP.js';
 import cron from 'node-cron';
 import Student from '../model/Student.js';
 import Libowner from '../model/Libowner.js';
-// import sgMail from '@sendgrid/mail';
 
 dotenv.config();
 
-// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-// Run cron job daily at midnight
 cron.schedule('0 0 * * *', async () => {
     const currentDate = new Date();
     let libownerNotifications = {};
@@ -23,148 +19,158 @@ cron.schedule('0 0 * * *', async () => {
             user: 'amanvermalmv211@gmail.com',
             pass: process.env.MAIL_PASS
         }
-    })
+    });
 
-    const students = await Student.find({
-        'subscriptionDetails.expiryDate': { $lt: currentDate },
-        'subscriptionDetails.blocked': false
-    })
-        .populate('userId', 'email') // Ensure this correctly fetches email
-        .populate('subscriptionDetails.libraryId', 'libname userId floors')
-        .lean(); // Convert documents into plain objects for easier handling
+    try {
+        const students = await Student.find({
+            'subscriptionDetails.expiryDate': { $lt: currentDate },
+            'subscriptionDetails.blocked': false
+        })
+            .populate('userId', 'email')
+            .populate('subscriptionDetails.libraryId', 'libname userId floors');
 
-    for (let student of students) {
-        let updatedSubscriptions = [];
-        let sendEmail = false;
-        const studentEmail = student.userId.email;
-        console.log("This is email of student: ", studentEmail);
-        console.log(student.subscriptionDetails);
-
-        console.log("Pass 1");
-
-        for (let subs of student.subscriptionDetails) {
-            if (subs.expiryDate < currentDate && !subs.blocked) {
-                const expiryDate = new Date(subs.expiryDate);
-                const daysSinceExpiry = (currentDate - expiryDate) / (1000 * 60 * 60 * 24);
-                console.log("Pass 2");
-                console.log(expiryDate);
-                console.log(daysSinceExpiry);
-                // const daysSinceExpiry = Math.floor((currentDate - subs.expiryDate) / (1000 * 60 * 60 * 24));
-
-                // Check if last notification was sent more than 5 days ago
-                if (!subs.emailSentDate || (daysSinceExpiry >= 5 && daysSinceExpiry <= 6)) {
-                    sendEmail = true;
-                    subs.emailSentDate = currentDate;
-
-                    // const studentMsg = {
-                    //     to: studentEmail,
-                    //     from: 'amanvermalmv211@gmail.com',
-                    //     subject: `Your Subscription at ${subs.libraryId.libname} has Expired!`,
-                    //     text: `Your subscription expired on ${subs.expiryDate.toDateString()}. Please renew it to continue using the services.`
-                    // };
-                    // await sgMail.send(studentMsg);
-
-                    console.log("Pass 3");
-
-                    const stdmailOptions = {
-                        from: 'amanvermalmv211@gmail.com',
-                        to: studentEmail,
-                        subject: `Your Subscription at ${subs.libraryId.libname} has Expired!`,
-                        html: `<p>Your subscription expired on ${subs.expiryDate.toDateString()}. Please renew it to continue using the services.</p>`
-                    }
-                    console.log("Pass 4");
-                    await transporter.sendMail(stdmailOptions);
-                    console.log("Pass 5");
+        for (let student of students) {
+            try {
+                let updatedSubscriptions = [];
+                let sendEmail = false;
+                const studentEmail = student.userId?.email;
+                if (!studentEmail) {
+                    continue;
                 }
-                
-                // Update `isBooked` field in Libowner Schema (Only for first-time expiry)
-                const library = subs.libraryId;
-                if (library) {
-                    console.log("Pass 6");
-                    const floor = library.floors[subs.idxFloor];
-                    if (floor) {
-                        console.log("Pass 7");
-                        const shift = floor.shifts[subs.idxShift];
-                        if (shift) {
-                            console.log("Pass 8");
-                            const seat = shift.numberOfSeats[subs.idxSeatSelected];
-                            if (seat && seat.isBooked && String(seat.student) === String(student._id)) {
-                                seat.isBooked = false; // Mark the seat as available
-                                seat.student = null;   // Remove the student reference
-                                await library.save();  // Save changes to the database
-                                console.log("Pass 9");
+
+                for (let subs of student.subscriptionDetails) {
+                    try {
+                        if (subs.expiryDate < currentDate && !subs.blocked) {
+                            const expiryDate = new Date(subs.expiryDate);
+                            const daysSinceExpiry = (currentDate - expiryDate) / (1000 * 60 * 60 * 24);
+
+                            if (!subs.emailSentDate || (daysSinceExpiry >= 5 && daysSinceExpiry <= 6)) {
+                                sendEmail = true;
+                                subs.emailSentDate = currentDate;
+
+                                const stdmailOptions = {
+                                    from: 'amanvermalmv211@gmail.com',
+                                    to: studentEmail,
+                                    subject: `Your Subscription at ${subs.libraryId.libname} has Expired!`,
+                                    text: `Subscription Expired
+                                    Hey! ${student.name}, your subscription expired on ${expiryDate.toDateString()}.
+                                    Please renew your subscription to continue enjoying our services.
+                                    Renew Now: merilibrary.in/student/profile
+                                    ---------------------------------------------------
+                                    If you have already renewed, please ignore this message.
+                                    Best Regards, 
+                                    meriLibrary Team 
+                                    merilibrary.in`,
+                                    html: `<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; color: #ffffff;">
+                                    <div style="max-width: 500px; margin: 20px auto; background: #1c1c1c; padding: 20px; border-radius: 10px; text-align: center;">
+                                    <h2 style="color: #ff6b6b; margin-bottom: 10px;">Subscription Expired</h2>
+                                    <p style="color: #d3d3d3; font-size: 14px;">Hey! ${student.name}, your subscription expired on <strong>${expiryDate.toDateString()}</strong>.</p>
+                                    <p style="color: #d3d3d3; font-size: 14px;">Please renew your subscription to continue enjoying our services.</p>
+                                    <a href="https://merilibrary.in/student/profile" style="display: inline-block; background: #6dd5ed; color: #121212; text-decoration: none; font-weight: bold; padding: 10px 20px; border-radius: 5px; margin-top: 20px;">Renew Now</a>
+                                    <hr style="border: 0; height: 1px; background: #444; margin: 20px 0;">
+                                    <p style="font-size: 12px; color: #888;">If you have already renewed, please ignore this message.</p>
+                                    <p style="font-size: 12px; color: #888;">Best Regards, <br> <strong>meriLibrary Team</strong> <br> <a href="https://merilibrary.in" style="color: #6dd5ed; text-decoration: none;">merilibrary.in</a></p>
+                                    </div>
+                                    </body>`
+                                };
+                                await transporter.sendMail(stdmailOptions);
                             }
+
+                            const library = subs.libraryId;
+                            if (library) {
+                                try {
+                                    const floor = library.floors?.[subs.idxFloor];
+                                    const shift = floor?.shifts?.[subs.idxShift];
+                                    const seat = shift?.numberOfSeats?.[subs.idxSeatSelected];
+
+                                    if (seat?.isBooked && String(seat.student) === String(student._id)) {
+                                        seat.isBooked = false;
+                                        seat.student = null;
+                                        await library.save();
+                                    }
+                                } catch (err) {
+                                    console.log("⚠️ Error updating library seat info:", err);
+                                }
+                            }
+
+                            const ownerId = subs.libraryId?._id;
+                            if (ownerId) {
+                                if (!libownerNotifications[ownerId]) libownerNotifications[ownerId] = [];
+                                libownerNotifications[ownerId].push({
+                                    studentName: student.name,
+                                    expiryDate: subs.expiryDate,
+                                    seatDetails: `Floor ${subs.idxFloor}, Shift ${Number(subs.idxShift) + 1}, Seat ${Number(subs.idxSeatSelected) + 1}`
+                                });
+                            }
+
+                            subs.blocked = daysSinceExpiry >= 7;
                         }
+                        updatedSubscriptions.push(subs);
+                    } catch (err) {
+                        console.log("⚠️ Error processing student subscription:", err);
                     }
                 }
 
-                // Collect notifications for library owners
-                const ownerId = subs.libraryId.userId;
-                if (!libownerNotifications[ownerId]) libownerNotifications[ownerId] = [];
-                libownerNotifications[ownerId].push({
-                    studentName: student.name,
-                    expiryDate: subs.expiryDate,
-                    seatDetails: `Floor ${subs.idxFloor}, Shift ${subs.idxShift}, Seat ${subs.idxSeatSelected}`
-                });
+                student.subscriptionDetails = updatedSubscriptions;
+                if (sendEmail) await student.save();
+            } catch (err) {
+                console.log("⚠️ Error processing student:", err);
+            }
+        }
 
-                console.log("Pass 10")
-                
-                // If it's been more than 15 days, mark as blocked
-                if (daysSinceExpiry < 7) {
-                    updatedSubscriptions.push(subs);
-                    console.log("Pass 11")
-                } else {
-                    subs.blocked = true; // Mark as blocked after 15 days
-                    updatedSubscriptions.push(subs);
-                    console.log("Pass 12")
+        for (const ownerId in libownerNotifications) {
+            try {
+                const owner = await Libowner.findById(ownerId).populate('userId', 'email');
+                if (owner && owner.userId?.email) {
+                    const ownmailOptions = {
+                        from: 'amanvermalmv211@gmail.com',
+                        to: owner.userId.email,
+                        subject: `Daily Subscription Expiry Report`,
+                        text: `Subscription Expiry Notification (${owner.libname})
+                        The following students' subscriptions have expired:
+                        ${libownerNotifications[ownerId].map(s => 
+                            `${s.studentName} | ${new Date(s.expiryDate).toDateString()} | ${s.seatDetails}`
+                        ).join('\n')}
+                        Please take the necessary actions to renew or remove these students.
+                        Best Regards,  
+                        meriLibrary Team  
+                        merilibrary.in
+                        `,
+                        html: `<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; color: #ffffff;">
+                        <div style="max-width: 600px; margin: 20px auto; background: #1c1c1c; padding: 20px; border-radius: 10px; text-align: center;">
+                        <h2 style="color: #ffffff; margin-bottom: 10px;">Subscription Expiry Notification (${owner.libname})</h2>
+                        <p style="color: #d3d3d3; font-size: 14px; margin-bottom: 20px;">The following students' subscriptions have expired:</p>
+                        <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+                        <tr>
+                        <th style="border-bottom: 1px solid #444; padding: 8px; color: #6dd5ed; text-align: left;">Student</th>
+                        <th style="border-bottom: 1px solid #444; padding: 8px; color: #6dd5ed; text-align: left;">Expiry Date</th>
+                        <th style="border-bottom: 1px solid #444; padding: 8px; color: #6dd5ed; text-align: left;">Seat</th>
+                        </tr>
+                        ${libownerNotifications[ownerId].map(s => `
+                            <tr>
+                            <td style="border-bottom: 1px solid #444; padding: 8px; text-align: left;">${s.studentName}</td>
+                            <td style="border-bottom: 1px solid #444; padding: 8px; text-align: left;">${new Date(s.expiryDate).toDateString()}</td>
+                            <td style="border-bottom: 1px solid #444; padding: 8px; text-align: left;">${s.seatDetails}</td>
+                            </tr>
+                            `).join('')}
+                            </table>
+                            <hr style="border: 0; height: 1px; background: #444; margin: 20px 0;">
+                            <p style="font-size: 12px; color: #888;">Please take the necessary actions to renew or remove these students.</p>
+                            <p style="font-size: 12px; color: #888;">Best Regards, <br> <strong>meriLibrary Team</strong> <br> <a href="https://merilibrary.in" style="color: #6dd5ed; text-decoration: none;">merilibrary.in</a></p>
+                            </div>
+                            </body>`
+                    };
+                    await transporter.sendMail(ownmailOptions);
                 }
-            } else {
-                updatedSubscriptions.push(subs);
-                console.log("Pass 13")
+            } catch (err) {
+                console.log("⚠️ Error sending email to library owner:", err);
             }
         }
-        
-        // Update student subscriptions in DB
-        student.subscriptionDetails = updatedSubscriptions;
-        console.log("Pass 14")
-        if (sendEmail) await student.save();
-        console.log("Pass 15")
+    } catch (err) {
+        console.log("⚠️ Error fetching students from DB:", err);
     }
-
-    // Fetch library owners' emails and send notifications
-    for (const ownerId in libownerNotifications) {
-        console.log("Pass 16")
-        const owner = await Libowner.findById(ownerId).populate('userId', 'email');
-        console.log("Pass 17")
-
-        if (owner) {
-            // const ownerMsg = {
-            //     to: owner.userId.email,
-            //     from: 'amanvermalmv211@gmail.com',
-            //     subject: `Daily Subscription Expiry Report`,
-            //     text: `The following students' subscriptions have expired:\n${libownerNotifications[ownerId].map(
-            //         s => `Student: ${s.studentName}, Expiry: ${s.expiryDate.toDateString()}, Seat: ${s.seatDetails}`
-            //     ).join('\n')}`
-            // };
-            // await sgMail.send(ownerMsg);
-
-            console.log("This is email of student: ", owner.userId.email);
-
-            const ownmailOptions = {
-                from: 'amanvermalmv211@gmail.com',
-                to: owner.userId.email,
-                subject: `Daily Subscription Expiry Report`,
-                html: `<p>The following students' subscriptions have expired:\n${libownerNotifications[ownerId].map(
-                    s => `Student: ${s.studentName}, Expiry: ${s.expiryDate.toDateString()}, Seat: ${s.seatDetails}`
-                ).join('\n')}</p>`
-            }
-            await transporter.sendMail(ownmailOptions);
-            console.log("Pass 18")
-        }
-    }
-
+    console.log("✅ Cron job completed");
 });
-
 
 async function sendOTP(req, res) {
     const transporter = nodemailer.createTransport({
@@ -181,8 +187,26 @@ async function sendOTP(req, res) {
     const mailOptions = {
         from: 'amanvermalmv211@gmail.com',
         to: req.body.email,
-        subject: 'Verify Your Email(Testing Period)',
-        html: `<p>OTP for verification at mylibrary.in is : <b>${otp}</b>.<br>This code is expires within 2 minutes.</p>`
+        subject: 'Verify your email at merilibrary.in',
+        text: `Thank You for Signing Up
+        Enter this code below to verify your email: ${otp}
+        This code will expire in 2 minutes. Do not share it with anyone.
+        ---------------------------------------------------
+        Your privacy is important to us. If you didn’t request this verification, please ignore this email.
+        Best Regards, 
+        merilibrary Team
+        merilibrary.in`,
+        html: `<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; color: #ffffff;">
+        <div style="max-width: 500px; margin: 20px auto; background: #1c1c1c; padding: 20px; border-radius: 10px; text-align: center;">
+        <h2 style="color: #ffffff; margin-bottom: 10px;">Thank You for Signing Up</h2>
+        <p style="color: #d3d3d3; font-size: 14px; margin-bottom: 20px;">Use this code to verify your email:</p>
+        <div style="font-size: 36px; font-weight: bold; color: #6dd5ed; margin: 20px 0;">${otp}</div>
+        <p style="color: #d3d3d3; font-size: 14px;">This code will expire in <strong>2 minutes</strong>. Do not share it with anyone.</p>
+        <hr style="border: 0; height: 1px; background: #444; margin: 20px 0;">
+        <p style="font-size: 12px; color: #888; margin-top: 10px;">Your privacy is important to us. If you didn’t request this verification, please ignore this email.</p>
+        <p style="font-size: 12px; color: #888;">Best Regards, <br> <strong>meriLibrary Team</strong> <br> <a href="https://merilibrary.in" style="color: #6dd5ed; text-decoration: none;">merilibrary.in</a></p>
+    </div>
+</body>`
     }
 
     try {

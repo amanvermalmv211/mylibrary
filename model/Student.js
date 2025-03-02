@@ -82,9 +82,7 @@ const StudentSchema = new Schema({
             },
             emailSentDate: {
                 type: Date,
-                default: null,
-                get: (emailSentDate) => emailSentDate.getTime(),
-                set: (emailSentDate) => new Date(emailSentDate)
+                default: null
             }
         }],
         default: [],
