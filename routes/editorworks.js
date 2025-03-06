@@ -122,7 +122,6 @@ router.put('/updateapp/:id', fetchuser, fetchIsAllowed, async (req, res) => {
         if (formlink) { newApp.formlink = formlink }
         if (youtubelink) { newApp.youtubelink = youtubelink }
         if (endformdate) { newApp.endformdate = endformdate }
-        if (expirydate) { newApp.expirydate = expirydate }
 
         const updatedApp = await Result.findByIdAndUpdate(req.params.id, { $set: newApp }, { new: true });
         success = true;

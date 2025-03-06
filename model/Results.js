@@ -20,7 +20,7 @@ const ResultSchema = new Schema({
     },
     endformdate: {
         type: Date,
-        default: null
+        default: Date.now
     }
 });
 
