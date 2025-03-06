@@ -12,19 +12,15 @@ const ResultSchema = new Schema({
     },
     formlink: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     youtubelink: {
         type: String,
-        required: true,
-        unique: true
+        default: ""
     },
     endformdate: {
         type: Date,
-        required: true,
-        get: (endformdate) => endformdate.getTime(),
-        set: (endformdate) => new Date(endformdate)
+        default: null
     }
 });
 

@@ -146,9 +146,17 @@ router.post('/approve-request', fetchuser, fetchIsAllowed, async (req, res) => {
             return res.status(400).json({ success: false, message: `Gender mismatch: Seat is for ${seat.gender}s only` });
         }
 
-        if (student.subscriptionDetails.length >= 2) {
+        const activeSubscriptions = student.subscriptionDetails.filter(subs =>
+            subs.expiryDate > new Date()
+        );
+
+        if (activeSubscriptions.length >= 2) {
             return res.status(400).json({ success: false, message: 'Student already has 2 active subscriptions' });
         }
+
+        student.subscriptionDetails = student.subscriptionDetails.filter(subs =>
+            subs.expiryDate > new Date()
+        );
 
         if (!subsDays || isNaN(Date.parse(subsDays))) {
             return res.status(400).json({ success: false, message: "Invalid expiry date provided." });

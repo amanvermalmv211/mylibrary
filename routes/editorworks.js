@@ -25,7 +25,7 @@ router.post('/addebooks', fetchuser, fetchIsAllowed, async (req, res) => {
         return res.status(200).json({ success, message: "Book added successfully", ebook: ebook })
     }
     catch (err) {
-        return res.status(400).json({ success: false, message: err.message })
+        return res.status(400).json({ success: false, message: "Internal Server Error" })
     }
 });
 
@@ -42,7 +42,7 @@ router.delete('/deleteebooks/:id', fetchuser, fetchIsAllowed, async (req, res) =
         return res.status(200).json({ success, message: "E-Book deleted successfully" })
     }
     catch (err) {
-        return res.status(500).json({ success: false, message: "Unable to delete E-books" });
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 });
 
@@ -66,7 +66,7 @@ router.put('/updateebooks/:id', fetchuser, fetchIsAllowed, async (req, res) => {
         return res.status(200).json({ success, message: "E-Book has been updated!", data: updatedEbook })
     }
     catch (err) {
-        return res.status(500).json({ success: false, message: "Unable to update E-books" });
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 });
 
@@ -87,7 +87,7 @@ router.post('/addapp', fetchuser, fetchIsAllowed, async (req, res) => {
         return res.status(200).json({ success, message: "Application added successfully!", result: result })
     }
     catch (err) {
-        return res.status(400).json({ success: false, message: err.message })
+        return res.status(400).json({ success: false, message: "Internal Server Error" })
     }
 });
 
@@ -104,7 +104,7 @@ router.delete('/deleteapp/:id', fetchuser, fetchIsAllowed, async (req, res) => {
         return res.status(200).json({ success, message: "Application deleted successfully" })
     }
     catch (err) {
-        return res.status(500).json({ success: false, message: "Unable to delete Application" });
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 });
 
@@ -130,7 +130,7 @@ router.put('/updateapp/:id', fetchuser, fetchIsAllowed, async (req, res) => {
         return res.status(200).json({ success, message: "Application has been updated!", data: updatedApp })
     }
     catch (err) {
-        return res.status(500).json({ success: false, message: "Unable to update Application" });
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 });
 

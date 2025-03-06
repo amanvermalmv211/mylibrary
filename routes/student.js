@@ -181,4 +181,20 @@ router.delete('/deleterequest/:id', fetchuser, fetchIsStudent, async (req, res) 
     }
 });
 
+// Route 6 : Get library to reserve seat again using : GET "/student/getlibrary"
+router.get('/getlibrary/:id', fetchuser, fetchIsStudent, async (req, res) => {
+    try {
+        const library = await Libowner.findById(req.params.id);
+
+        if (!library) {
+            return res.status(400).json({ success: false, message: 'Library not found' });
+        }
+
+        res.status(200).json({ success: true, data: library });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 export default router;
