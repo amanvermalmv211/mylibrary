@@ -97,26 +97,6 @@ router.put('/updatelibrary/:id', fetchuser, fetchIsAdmin, async (req, res) => {
             library.floors = libraryDetails.floors;
         }
 
-        // // Update shifts if provided
-        // if (Array.isArray(libraryDetails.shifts)) {
-        //     library.shifts = libraryDetails.shifts.map((shift) => ({
-        //         stTime: shift.stTime || '7',
-        //         endTime: shift.endTime || '12',
-        //         price: shift.price || 700,
-        //         discountPrice: shift.discountPrice || 500,
-        //         numberOfSeats: shift.numberOfSeats ?
-        //             shift.numberOfSeats.map(seat => ({
-        //                 student: seat.student || null,
-        //                 gender: seat.gender || 'boy',
-        //                 isBooked: seat.isBooked || false
-        //             })) : Array(80).fill({
-        //                 student: null,
-        //                 gender: 'boy',
-        //                 isBooked: false
-        //             })
-        //     }));
-        // }
-
         // Mark the library as allowed to be functional.
         library.isallowed = true;
 
