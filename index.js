@@ -8,7 +8,7 @@ import libowner from './routes/libowner.js';
 import student from './routes/student.js';
 import editorworks from './routes/editorworks.js';
 import publicroute from './routes/publicroute.js';
-import sitemapRoutes from './routes/sitemap.js';
+import sitemaproutes from './routes/sitemap.js';
 import path from 'path';
 
 const app = express();
@@ -35,10 +35,13 @@ app.use('/student', student);
 app.use('/editor', editorworks);
 app.use('/user', publicroute);
 
-app.use('/', sitemapRoutes);  // Use the sitemap route
+app.use('/', sitemaproutes);  // Use the sitemap route
 
 // Serve React frontend for any unknown routes
-app.get('*', (req, res) => {
+app.get('*', (req, res, next) => {
+    if (req.path === '/sitemap.xml') {
+        return next();  // Allow sitemap to be handled by its route
+    }
     res.sendFile(path.join(buildpath, 'index.html'));
 });
 
