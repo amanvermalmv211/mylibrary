@@ -203,5 +203,41 @@ router.post('/approve-request', fetchuser, fetchIsAllowed, async (req, res) => {
     }
 });
 
+// Route 6 : Subscribe again using : GET "/libowner/subscribe"
+router.put('/subscribe', fetchuser, fetchIsAllowed, async (req, res) => {
+    let success = false;
+
+    try {
+        const libowner = await Libowner.findOne({ userId: req.user.id });
+
+        if (!libowner) {
+            return res.status(404).json({ success, message: "Library owner not found" });
+        }
+
+        const currentDate = new Date();
+        libowner.subscriptionDetails.subscriptionDate = currentDate;
+
+        const expDate = new Date(currentDate.setDate(currentDate.getDate() + 30));
+        libowner.subscriptionDetails.expiryDate = expDate;
+
+        await libowner.save();
+        
+
+        const libData = await libowner.populate({
+            path: 'floors.shifts.numberOfSeats.student',
+            select: 'name contactnum aadharnum localarea city subscriptionDetails',
+            populate: {
+                path: 'subscriptionDetails.libraryId',
+                match: { _id: libowner._id },
+                select: 'libname'
+            }
+        });
+
+        res.status(200).json({ success: true, data: libData });
+
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
 
 export default router;
