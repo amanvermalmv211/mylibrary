@@ -66,7 +66,7 @@ cron.schedule('0 0 * * *', async () => {
                                     <h2 style="color: #ff6b6b; margin-bottom: 10px;">Subscription Expired</h2>
                                     <p style="color: #d3d3d3; font-size: 14px;">Hey! ${student.name}, your subscription expired on <strong>${expiryDate.toDateString()}</strong>.</p>
                                     <p style="color: #d3d3d3; font-size: 14px;">Please renew your subscription to continue enjoying our services.</p>
-                                    <a href="https://merilibrary.in/student/profile" style="display: inline-block; background: #6dd5ed; color: #121212; text-decoration: none; font-weight: bold; padding: 10px 20px; border-radius: 5px; margin-top: 20px;">Renew Now</a>
+                                    <a href="https://merilibrary.in/student" style="display: inline-block; background: #6dd5ed; color: #121212; text-decoration: none; font-weight: bold; padding: 10px 20px; border-radius: 5px; margin-top: 20px;">Renew Now</a>
                                     <hr style="border: 0; height: 1px; background: #444; margin: 20px 0;">
                                     <p style="font-size: 12px; color: #888;">If you have already renewed, please ignore this message.</p>
                                     <p style="font-size: 12px; color: #888;">Best Regards, <br> <strong>meriLibrary Team</strong> <br> <a href="https://merilibrary.in" style="color: #6dd5ed; text-decoration: none;">merilibrary.in</a></p>
@@ -103,7 +103,7 @@ cron.schedule('0 0 * * *', async () => {
                                 });
                             }
 
-                            subs.blocked = daysSinceExpiry >= 7;
+                            subs.blocked = daysSinceExpiry >= 6;
                         }
                         updatedSubscriptions.push(subs);
                     } catch (err) {
