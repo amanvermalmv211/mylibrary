@@ -103,7 +103,7 @@ cron.schedule('0 0 * * *', async () => {
                                 });
                             }
 
-                            subs.blocked = daysSinceExpiry >= 6;
+                            subs.blocked = daysSinceExpiry >= 5;
                         }
                         updatedSubscriptions.push(subs);
                     } catch (err) {
